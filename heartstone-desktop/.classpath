@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="assets"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/heartstone"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl.jar" sourcepath="libs/gdx-backend-lwjgl-sources.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl-natives.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-natives.jar"/>
+	<classpathentry kind="lib" path="libs/gdx-tools.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Usuario/Desktop/DAM/DAM 2/AD/libs/kryonet-2.21/jars/production/onejar/kryonet-2.21-all.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
