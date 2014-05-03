@@ -6,6 +6,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetErrorListener;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -20,6 +22,9 @@ public class Assets implements Disposable, AssetErrorListener {
 	public AssetsCards carta;
 	public AssetCardHitPoints hitPoint;
 	public AssetFonts fonts;
+
+	public AssetSounds sounds;
+	public AssetMusic music;
 
 	// singleton: prevent instantiation from other classes
 	private Assets() {
@@ -49,13 +54,15 @@ public class Assets implements Disposable, AssetErrorListener {
 		// create game resource objects
 		carta = new AssetsCards(atlas);
 		hitPoint = new AssetCardHitPoints(atlas);
-		fonts= new AssetFonts();
+		fonts = new AssetFonts();
+		sounds = new AssetSounds(assetManager);
+		music = new AssetMusic(assetManager);
 	}
 
 	@Override
 	public void dispose() {
 		assetManager.dispose();
-		//Bitmap fonts must be disposed manually
+		// Bitmap fonts must be disposed manually
 		fonts.defaultSmall.dispose();
 		fonts.defaultNormal.dispose();
 		fonts.defaultBig.dispose();
@@ -120,6 +127,46 @@ public class Assets implements Disposable, AssetErrorListener {
 					.setFilter(TextureFilter.Linear, TextureFilter.Linear);
 			defaultBig.getRegion().getTexture()
 					.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		}
+	}
+
+	public class AssetSounds {
+		public final Sound attack;
+		public final Sound selectCard;
+		public final Sound win;
+		public final Sound dead_guy;
+		public final Sound cant_move_card;
+		public final Sound new_card;
+		public final Sound pass_turn;
+		public final Sound loose;
+		public final Sound get_turn;
+
+		public AssetSounds(AssetManager am) {
+			// attack = am.get("sounds/ataque.wav", Sound.class);
+			attack = Gdx.audio
+					.newSound(Gdx.files.internal("sounds/ataque.wav"));
+			selectCard = Gdx.audio.newSound(Gdx.files
+					.internal("sounds/elegir_carta.wav"));
+			win = Gdx.audio.newSound(Gdx.files.internal("sounds/ganar.wav"));
+			dead_guy = Gdx.audio.newSound(Gdx.files
+					.internal("sounds/muerto_tio.wav"));
+			cant_move_card = Gdx.audio.newSound(Gdx.files
+					.internal("sounds/no_poder_sacar_carta.wav"));
+			new_card = Gdx.audio.newSound(Gdx.files
+					.internal("sounds/nueva_carta.wav"));
+			pass_turn = Gdx.audio.newSound(Gdx.files
+					.internal("sounds/pasar_turno.wav"));
+			loose = Gdx.audio.newSound(Gdx.files.internal("sounds/perder.wav"));
+			get_turn = Gdx.audio.newSound(Gdx.files
+					.internal("sounds/recibir_turno.wav"));
+		}
+	}
+
+	public class AssetMusic {
+		public final Music song01=null;
+
+		public AssetMusic(AssetManager am) {
+			
 		}
 	}
 

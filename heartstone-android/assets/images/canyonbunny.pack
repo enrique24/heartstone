@@ -19,14 +19,14 @@ repeat: none
   index: -1
 2
   rotate: false
-  xy: 1896, 806
+  xy: 2205, 806
   size: 58, 75
   orig: 58, 75
   offset: 0, 0
   index: -1
 3
   rotate: false
-  xy: 2082, 920
+  xy: 2391, 920
   size: 58, 75
   orig: 58, 75
   offset: 0, 0
@@ -54,21 +54,21 @@ repeat: none
   index: -1
 7
   rotate: false
-  xy: 1896, 729
+  xy: 2205, 729
   size: 58, 75
   orig: 58, 75
   offset: 0, 0
   index: -1
 8
   rotate: false
-  xy: 1956, 806
+  xy: 2265, 806
   size: 58, 75
   orig: 58, 75
   offset: 0, 0
   index: -1
 9
   rotate: false
-  xy: 2142, 920
+  xy: 2451, 920
   size: 58, 75
   orig: 58, 75
   offset: 0, 0
@@ -89,7 +89,7 @@ Boton (Pasar Turno)
   index: -1
 Boton (Turno Enemigo)
   rotate: false
-  xy: 1896, 883
+  xy: 2205, 883
   size: 184, 112
   orig: 184, 112
   offset: 0, 0
@@ -171,51 +171,58 @@ ironfurgrizzly
   orig: 307, 465
   offset: 0, 0
   index: -1
-koboldgeomancer
+jugador
   rotate: false
   xy: 3448, 1464
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
-lordofthearena
+koboldgeomancer
   rotate: false
   xy: 3757, 1464
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
-magmarager
+lordofthearena
   rotate: false
   xy: 1285, 997
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
-malygos
+magmarager
   rotate: false
   xy: 1594, 997
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
-murlockraider
+malygos
   rotate: false
   xy: 1903, 997
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
-ogremagi
+murlockraider
   rotate: false
   xy: 2212, 997
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
-ragnarosfirelord
+ogremagi
   rotate: false
   xy: 2521, 997
+  size: 307, 465
+  orig: 307, 465
+  offset: 0, 0
+  index: -1
+ragnarosfirelord
+  rotate: false
+  xy: 2830, 997
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
@@ -229,42 +236,42 @@ resplandor
   index: -1
 rivercrocolisk
   rotate: false
-  xy: 2830, 997
+  xy: 3139, 997
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 senjinshieldmast
   rotate: false
-  xy: 3139, 997
+  xy: 3448, 997
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 wargolem
   rotate: false
-  xy: 3448, 997
+  xy: 3757, 997
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 wisp
   rotate: false
-  xy: 3757, 997
+  xy: 1278, 530
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 worgeninfiltrator
   rotate: false
-  xy: 1278, 530
+  xy: 1587, 530
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 youngpriestess
   rotate: false
-  xy: 1587, 530
+  xy: 1896, 530
   size: 307, 465
   orig: 307, 465
   offset: 0, 0

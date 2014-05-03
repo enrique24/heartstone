@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import gameObjects.Card;
 import gameObjects.CardPointNumber;
 import gameObjects.Player;
+import util.AudioManager;
 import util.CameraHelper;
 import util.Constants;
 import util.Network;
@@ -74,6 +75,10 @@ public class WorldController extends InputAdapter {
 	public boolean addNewCard = false;
 	//boolean used to start the animation of loosing a card if you have the max amount of card allowed on hand
 	public boolean looseCard=false;
+	//booleans used for playing sound purposes
+	public boolean playMoveCardSound=true;
+	public boolean playAttackSound=true;
+	//TODO a lo mejor algun booleano para sonido mas
 	// Card that is going to have an animation
 	Card animatedCard;
 	// Card that is going to be attacked
@@ -100,45 +105,6 @@ public class WorldController extends InputAdapter {
 	public WorldController(Client socket, Listener listener) {
 		init();
 		this.clientSocket = socket;
-		//clientSocket.removeListener(listener);
-		/*/clientSocket.addListener(new Listener() {
-			public void connected(Connection connection) {
-				RegisterName registerName = new RegisterName();
-				registerName.name = "Start";
-				clientSocket.sendTCP(registerName);
-				
-			}
-			public void received(Connection connection, Object object) {
-				if (object instanceof Stats) {
-					Stats newCard = (Stats) object;
-					addCardToGame(newCard, cardsHand);
-					return;
-				}
-
-				if (object instanceof ActionMessage) {
-					ActionMessage receivedAction = (ActionMessage) object;
-					if (receivedAction.action.equals(ActionMessage.START)) {
-						startGame = true;
-						System.out.println("q pasa");
-						clientSocket.sendTCP(receivedAction);
-						return;
-					} else if (receivedAction.action
-							.equals(ActionMessage.PASS_TURN)) {
-						player.setYourTurn(true);
-					}
-					return;
-				}
-
-				if (object instanceof Player) {
-					player = (Player) object;
-					return;
-				}
-			}
-
-			public void disconnected(Connection connection) {
-				// TODO: volver a la pantalla inicial al desconectar
-			}
-		});*/
 		new Thread("ww") {
 			public void run() {
 				try {
@@ -245,6 +211,7 @@ public class WorldController extends InputAdapter {
 			dyingParticles2.update(deltaTime);
 			attackParticles.update(deltaTime);
 			attackParticles2.update(deltaTime);
+			
 
 		}
 
@@ -304,6 +271,7 @@ public class WorldController extends InputAdapter {
 											* (6) * -1)) {
 								testSprites[1].setPosition(carta.position.x,
 										carta.position.y);
+								AudioManager.instance.play(Assets.instance.sounds.selectCard);
 								// Set as selected the card that has been
 								// touched
 								for (int i = 0; i < cardsHand.size(); i++) {
@@ -345,6 +313,7 @@ public class WorldController extends InputAdapter {
 											* (6) * -1)) {
 								testSprites[1].setPosition(carta.position.x,
 										carta.position.y);
+								AudioManager.instance.play(Assets.instance.sounds.selectCard);
 								for (int i = 0; i < cardsTable.size(); i++) {
 									if (cardsTable.get(i) == carta) {
 										cardsTable.get(i).setSelected(true);
@@ -414,7 +383,7 @@ public class WorldController extends InputAdapter {
 							cardsHand.remove(i);
 							moveToTable = true;
 							reorderHandCards = true;
-
+							AudioManager.instance.play(Assets.instance.sounds.new_card);
 							//send data to server
 							Stats sendCard=getStatsFromCard(animatedCard);
 							sendCard.setCardAction(Stats.CARD_ACTION_NEW_ENEMY_CARD);
@@ -439,7 +408,8 @@ public class WorldController extends InputAdapter {
 										* -1)) {
 
 						}
-						// TODO: sonido de que no se puede realizar esa accion
+						
+						
 					}
 				}
 			}
@@ -485,7 +455,7 @@ public class WorldController extends InputAdapter {
 				if (i == cardsTable.size() - 1)
 					return;
 			}
-			if (Gdx.input.justTouched()) {
+			if (Gdx.input.justTouched() && !attackCard) {
 				// Check if an enemy card is touched while a card in the hand is
 				// selected
 				for (Card carta : cardsEnemy) {
@@ -582,6 +552,7 @@ public class WorldController extends InputAdapter {
 					attackSpecialEffect = true;
 					attackParticles.start();
 					attackParticles2.start();
+					AudioManager.instance.play(Assets.instance.sounds.attack);
 				}
 
 				if (animatedCard.position.y < attackedCard.position.y + 0.1)
@@ -640,6 +611,7 @@ public class WorldController extends InputAdapter {
 					attackSpecialEffect = true;
 					attackParticles.start();
 					attackParticles2.start();
+					AudioManager.instance.play(Assets.instance.sounds.attack);
 				}
 				if (animatedCard.position.y > attackedCard.position.y - 0.1)
 					returningCard = true;
@@ -703,7 +675,7 @@ public class WorldController extends InputAdapter {
 	// Animation for a card that is going to die
 	private void cardDiesAnimation() {
 		if (dyingCard) {
-
+			
 			// only the animated or the attacked card are the ones that can
 			// die
 			if (animatedCard.getDefensePoints() == 0) {
@@ -711,11 +683,15 @@ public class WorldController extends InputAdapter {
 						animatedCard.position.y + 2.1f);
 				dyingParticles.start();
 				animatedCard.setAlpha(animatedCard.getAlpha() - 0.01f);
+				if(playAttackSound)
+				AudioManager.instance.play(Assets.instance.sounds.dead_guy);
+				playAttackSound=false;
 			}
 			if (animatedCard.getAlpha() < 0) {
 				cardsEnemy.remove(animatedCard);
 				cardsTable.remove(animatedCard);
 				dyingCard = false;
+				playAttackSound=true;
 				if (cardsTable.contains(animatedCard)) {
 					player.setCardsOntable(player.getCardsOntable() - 1);
 				} else {
@@ -731,11 +707,15 @@ public class WorldController extends InputAdapter {
 						attackedCard.position.y + 2.1f);
 				dyingParticles2.start();
 				attackedCard.setAlpha(attackedCard.getAlpha() - 0.01f);
+				if(playAttackSound)
+					AudioManager.instance.play(Assets.instance.sounds.dead_guy);
+				playAttackSound=false;
 			}
 			if (attackedCard.getAlpha() < 0) {
 				cardsEnemy.remove(attackedCard);
 				cardsTable.remove(attackedCard);
 				dyingCard = false;
+				playAttackSound=true;
 				if (cardsTable.contains(attackedCard)) {
 					player.setCardsOntable(player.getCardsOntable() - 1);
 				} else {
@@ -765,6 +745,8 @@ public class WorldController extends InputAdapter {
 			}
 			for (int i = 0; i < cardsHand.size(); i++) {
 				if(i<5){
+					if(playMoveCardSound)
+						AudioManager.instance.play(Assets.instance.sounds.new_card);
 					v2Velocity.set(
 							Constants.CARD_POSITION_HAND[i].x
 									- cardsHand.get(i).position.x,
@@ -779,6 +761,8 @@ public class WorldController extends InputAdapter {
 						if (cardsHand.get(i).position.x < Constants.CARD_POSITION_HAND[i].x + 0.02) {
 							cardsHand.get(i).position.x = Constants.CARD_POSITION_HAND[i].x;
 							reorderHandCards = false;
+							playMoveCardSound=true;
+							return;
 						}
 
 					}
@@ -788,6 +772,7 @@ public class WorldController extends InputAdapter {
 				}
 				
 			}
+			playMoveCardSound=false;
 		}
 	}
 
@@ -830,6 +815,8 @@ public class WorldController extends InputAdapter {
 				return;
 			}
 			for (int i = 0; i < cardsEnemy.size(); i++) {
+				if(playMoveCardSound)
+					AudioManager.instance.play(Assets.instance.sounds.new_card);
 				v2Velocity.set(
 						Constants.CARD_POSITION_OPPONENT[i].x
 								- cardsEnemy.get(i).position.x,
@@ -843,9 +830,12 @@ public class WorldController extends InputAdapter {
 					if (cardsEnemy.get(i).position.x < Constants.CARD_POSITION_OPPONENT[i].x + 0.02) {
 						cardsEnemy.get(i).position.x = Constants.CARD_POSITION_OPPONENT[i].x;
 						reorderEnemyCards = false;
+						playMoveCardSound=true;
+						return;
 					}
 				}
 			}
+			playMoveCardSound=false;
 		}
 	}
 
@@ -948,6 +938,7 @@ public class WorldController extends InputAdapter {
 											* -1)){
 						
 						player.setYourTurn(false);
+						AudioManager.instance.play(Assets.instance.sounds.pass_turn);
 						ActionMessage msg= new ActionMessage();
 						msg.action=ActionMessage.PASS_TURN;
 						clientSocket.sendTCP(msg);

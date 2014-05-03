@@ -41,6 +41,18 @@ public class WorldRenderer implements Disposable {
 		if(worldController.startGame){
 		renderTestObjects();
 		renderGui(batch);
+		}else{
+			worldController.cameraHelper.applyTo(camera);
+			batch.setProjectionMatrix(camera.combined);
+			batch.begin();
+			for(Sprite sprite : worldController.testSprites) {
+			sprite.draw(batch);
+			}
+			batch.end();
+			batch.setProjectionMatrix(cameraGUI.combined);
+			batch.begin();
+			Assets.instance.fonts.defaultBig.draw(batch, "Buscando enemigos contra los que enfrentarse", cameraGUI.viewportWidth/4.7f, cameraGUI.viewportHeight/2+20);			
+			batch.end();
 		}
 		
 	}

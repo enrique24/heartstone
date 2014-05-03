@@ -129,8 +129,8 @@ public class HStone implements ApplicationListener {
 		new Thread("Connect") {
 			public void run() {
 				try {
-					clientSocket.connect(100000, "85.54.168.57", Network.port);
-
+				//clientSocket.connect(10000, "81.172.115.2", Network.port);
+					clientSocket.connect(10000, "192.168.1.12", Network.port);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 					System.exit(1);

@@ -44,13 +44,13 @@ public class Constants {
 	public static final Vector2 PLAYER_BOUNDS = new Vector2(5.4f, -6);
 	public static final Vector2 ENEMY_PLAYER_BOUNDS = new Vector2(5.4f, 2.2f);
 
-	public static final String IN_MOVE_CARD = "a1";
-	public static final String IN_ATTACK_CARD = "a2";
-	public static final String IN_ATTACK_ENEMY = "a3";
-	public static final String IN_PASS_TURN = "a4";
-	public static final String OUT_MOVE_CARD = "a5";
-	public static final String OUT_ATTACK_CARD = "a6";
-	public static final String OUT_ATTACK_ENEMY = "a7";
-	public static final String OUT_PASS_TURN = "a8";
+	// Game preferences file
+		public static final String PREFERENCES = "hstone.prefs";
+		public static final String TEXTURE_ATLAS_UI = "images/canyonbunny-ui.pack";
+		public static final String TEXTURE_ATLAS_LIBGDX_UI = "images/uiskin.atlas";
+
+		// Location of description file for skins
+		public static final String SKIN_LIBGDX_UI = "images/uiskin.json";
+		public static final String SKIN_CANYONBUNNY_UI = "images/canyonbunny-ui.json";
 
 }

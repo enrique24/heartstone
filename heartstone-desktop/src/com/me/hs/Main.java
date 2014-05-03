@@ -39,15 +39,17 @@ public class Main {
 			settings.debug = drawDebugOutline;
 			TexturePacker.process(settings, "assets-raw/images",
 					"../heartstone-android/assets/images", "canyonbunny.pack");
+			TexturePacker.process(settings, "assets-raw/images-ui", "../heartstone-android/assets/images", "canyonbunny-ui.pack");
 		}
 		final LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "heartstone";
 		cfg.useGL20 = false;
-		cfg.width = 480;
+		cfg.width = 600;
 		cfg.height = 320;
 		client = new Client();
 
-     new LwjglApplication(new HStone(client,listener), cfg);
+     //new LwjglApplication(new HStone(client,listener), cfg);
+		new LwjglApplication(new HSMain(), cfg);
 	}
 	
 }

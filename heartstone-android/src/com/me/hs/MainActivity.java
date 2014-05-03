@@ -26,7 +26,8 @@ public class MainActivity extends AndroidApplication {
 	
 			client = new Client();
 			Listener listener=null;
-			 initialize(new HStone(client,listener), cfg);
+			initialize(new HSMain(), cfg);
+			// initialize(new HStone(client,listener), cfg);
 	
         
         
