@@ -44,8 +44,8 @@ public class Main {
 		final LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "heartstone";
 		cfg.useGL20 = false;
-		cfg.width = 600;
-		cfg.height = 320;
+		cfg.width = 640;
+		cfg.height = 400;
 		client = new Client();
 
      //new LwjglApplication(new HStone(client,listener), cfg);

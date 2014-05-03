@@ -46,7 +46,7 @@ public class HStone implements ApplicationListener {
 		// Load assets
 		Assets.instance.init(new AssetManager());
 		// Initialize controller and renderer
-		worldController = new WorldController(clientSocket, listener);
+		worldController = new WorldController(clientSocket, listener,null);
 		worldRenderer = new WorldRenderer(worldController);
 		// Game world is active on start
 		paused = false;

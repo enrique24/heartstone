@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import gameObjects.Card;
 import gameObjects.CardPointNumber;
 import gameObjects.Player;
+import screens.MenuScreen;
 import util.AudioManager;
 import util.CameraHelper;
 import util.Constants;
@@ -17,7 +18,9 @@ import util.Network.RegisterName;
 import util.Stats;
 import util.Network.ActionMessage;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Pixmap.Format;
@@ -25,6 +28,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -36,8 +40,8 @@ import com.me.hs.HStone;
 
 public class WorldController extends InputAdapter {
 
-	// TODO: deshabilitar el resto de acciones mientras se ejecuta una
-	// animacion, poner el tope de 5 cartas en la mesa y en la mano.
+	//The current game
+	Game game;
 	// The socket used to receive/send data from/to the server
 	private Client clientSocket;
 	public boolean startGame = false;
@@ -77,8 +81,10 @@ public class WorldController extends InputAdapter {
 	public boolean looseCard=false;
 	//booleans used for playing sound purposes
 	public boolean playMoveCardSound=true;
-	public boolean playAttackSound=true;
+	public boolean playDieSound=true;
+	public boolean playAttackSound=false;
 	//TODO a lo mejor algun booleano para sonido mas
+	public boolean disconnect=false;
 	// Card that is going to have an animation
 	Card animatedCard;
 	// Card that is going to be attacked
@@ -102,7 +108,8 @@ public class WorldController extends InputAdapter {
 	Rectangle buttonTurn;
 	public int maxCrystals=0;
 
-	public WorldController(Client socket, Listener listener) {
+	public WorldController(Client socket, Listener listener,Game game) {
+		this.game=game;
 		init();
 		this.clientSocket = socket;
 		new Thread("ww") {
@@ -131,7 +138,7 @@ public class WorldController extends InputAdapter {
 	private void initTestObjects() {
 		// Create new array for 2 sprites
 		player= new Player(false);
-		testSprites = new Sprite[2];
+		testSprites = new Sprite[4];
 		dyingParticles.load(Gdx.files.internal("particles/desaparecer.pfx"),
 				Gdx.files.internal("particles"));
 		dyingParticles.allowCompletion();
@@ -159,6 +166,15 @@ public class WorldController extends InputAdapter {
 
 		// Position of the card selected glow effect
 		testSprites[1].setPosition(11, 11);
+		//Cards that represents the enemy and the player
+		Sprite sprPlayer1= new Sprite(Assets.instance.carta.getCardRegion("jugador"));
+		sprPlayer1.setSize(Constants.CARD_WIDTH, Constants.CARD_HEIGHT);
+		sprPlayer1.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH,Constants.CARD_POSITION_HAND[4].y );
+		testSprites[2]=sprPlayer1;
+		Sprite sprPlayer2= new Sprite(Assets.instance.carta.getCardRegion("jugador"));
+		sprPlayer2.setSize(Constants.CARD_WIDTH, Constants.CARD_HEIGHT);
+		sprPlayer2.setPosition(Constants.CARD_POSITION_OPPONENT[4].x+Constants.CARD_WIDTH,Constants.CARD_POSITION_OPPONENT[4].y );
+		testSprites[3]=sprPlayer2;
 		// Background
 		Sprite spr2 = new Sprite(
 				Assets.instance.carta.getCardRegion("Backgroung"));
@@ -214,6 +230,7 @@ public class WorldController extends InputAdapter {
 			
 
 		}
+		backToMenu();
 
 	}
 
@@ -469,6 +486,7 @@ public class WorldController extends InputAdapter {
 											.getHeight() / 2))
 											/ (Gdx.graphics.getHeight() / 2)
 											* (6) * -1)) {
+						playAttackSound=true;
 						attackCard = true;
 						attackedCard = carta;
 						Stats animatedStats= getStatsFromCard(animatedCard);
@@ -477,8 +495,7 @@ public class WorldController extends InputAdapter {
 						attackedStats.setCardAction(Stats.CARD_ACTION_ATTACKED_CARD);
 						clientSocket.sendTCP(attackedStats);
 						clientSocket.sendTCP(animatedStats);
-						
-
+						return;
 					}
 				}
 				if (enemyPlayerBounds
@@ -492,6 +509,7 @@ public class WorldController extends InputAdapter {
 										* (6)
 										* -1)) {
 					attackCard = true;
+					playAttackSound=true;
 					attackedCard = new Card(null, enemyPlayerBounds.x,
 							enemyPlayerBounds.y, 0, 100, 0,null);
 					player.setEnemyHitPoints(player.getEnemyHitPoints()
@@ -523,6 +541,7 @@ public class WorldController extends InputAdapter {
 			}
 		}
 		attackCardEnemy = true;
+		playAttackSound=true;
 	}
 
 	// The animation of an enemy card attacking
@@ -552,7 +571,11 @@ public class WorldController extends InputAdapter {
 					attackSpecialEffect = true;
 					attackParticles.start();
 					attackParticles2.start();
-					AudioManager.instance.play(Assets.instance.sounds.attack);
+					if(playAttackSound){
+						AudioManager.instance.play(Assets.instance.sounds.attack);
+						playAttackSound=false;
+					}
+					
 				}
 
 				if (animatedCard.position.y < attackedCard.position.y + 0.1)
@@ -611,7 +634,10 @@ public class WorldController extends InputAdapter {
 					attackSpecialEffect = true;
 					attackParticles.start();
 					attackParticles2.start();
-					AudioManager.instance.play(Assets.instance.sounds.attack);
+					if(playAttackSound){
+						AudioManager.instance.play(Assets.instance.sounds.attack);
+						playAttackSound=false;
+					}
 				}
 				if (animatedCard.position.y > attackedCard.position.y - 0.1)
 					returningCard = true;
@@ -646,6 +672,7 @@ public class WorldController extends InputAdapter {
 	private void attacksLogic(Card yourCard, Card enemyCard) {
 		// your card new stats
 		TextureRegion regNumber;
+		playDieSound=true;
 		if (yourCard.getDefensePoints() - enemyCard.getAttackPoints() > 0) {
 			yourCard.setDefensePoints(yourCard.getDefensePoints()
 					- enemyCard.getAttackPoints());
@@ -683,15 +710,14 @@ public class WorldController extends InputAdapter {
 						animatedCard.position.y + 2.1f);
 				dyingParticles.start();
 				animatedCard.setAlpha(animatedCard.getAlpha() - 0.01f);
-				if(playAttackSound)
+				if(playDieSound)
 				AudioManager.instance.play(Assets.instance.sounds.dead_guy);
-				playAttackSound=false;
+				playDieSound=false;
 			}
 			if (animatedCard.getAlpha() < 0) {
 				cardsEnemy.remove(animatedCard);
 				cardsTable.remove(animatedCard);
 				dyingCard = false;
-				playAttackSound=true;
 				if (cardsTable.contains(animatedCard)) {
 					player.setCardsOntable(player.getCardsOntable() - 1);
 				} else {
@@ -707,15 +733,14 @@ public class WorldController extends InputAdapter {
 						attackedCard.position.y + 2.1f);
 				dyingParticles2.start();
 				attackedCard.setAlpha(attackedCard.getAlpha() - 0.01f);
-				if(playAttackSound)
+				if(playDieSound)
 					AudioManager.instance.play(Assets.instance.sounds.dead_guy);
-				playAttackSound=false;
+				playDieSound=false;
 			}
 			if (attackedCard.getAlpha() < 0) {
 				cardsEnemy.remove(attackedCard);
 				cardsTable.remove(attackedCard);
 				dyingCard = false;
-				playAttackSound=true;
 				if (cardsTable.contains(attackedCard)) {
 					player.setCardsOntable(player.getCardsOntable() - 1);
 				} else {
@@ -994,6 +1019,15 @@ public class WorldController extends InputAdapter {
 				attackedCard=card;
 			}
 		}
+	}
+	private void backToMenu () {
+		//disconnects from server and goes back to the menu screen
+		if(Gdx.input.isKeyPressed(Input.Keys.BACK)|| disconnect){
+			clientSocket.stop();
+			//game.setScreen(new MenuScreen(game));
+		}
+		
+		
 	}
 
 }

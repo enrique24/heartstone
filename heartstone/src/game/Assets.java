@@ -163,9 +163,11 @@ public class Assets implements Disposable, AssetErrorListener {
 	}
 
 	public class AssetMusic {
-		public final Music song01=null;
+		public final Music song01;
 
 		public AssetMusic(AssetManager am) {
+			song01=Gdx.audio.newMusic(Gdx.files
+					.internal("music/Hearthstone Soundtrack   Main Title[1].mp3"));
 			
 		}
 	}

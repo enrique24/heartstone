@@ -25,7 +25,7 @@ public class GameScreen extends AbstractGameScreen{
 	
 	private WorldController worldController;
 	private WorldRenderer worldRenderer;
-	private boolean paused;
+	private boolean paused,started=false;
 	private Client clientSocket;
 	private Listener listener;
 	private boolean firstTurn=true;
@@ -34,7 +34,7 @@ public class GameScreen extends AbstractGameScreen{
 		super(game);
 		// TODO puede que sea mejor cambiar lo del constructo al show
 	}
-	public GameScreen(Game game,Client client, Listener listen){
+	public GameScreen(final Game game,Client client, Listener listen){
 		super(game);
 		this.clientSocket = client;
 		this.listener = listen;
@@ -44,100 +44,11 @@ public class GameScreen extends AbstractGameScreen{
 				// Load assets
 				Assets.instance.init(new AssetManager());
 				// Initialize controller and renderer
-				worldController = new WorldController(clientSocket, listener);
+				worldController = new WorldController(clientSocket, listener,game);
 				worldRenderer = new WorldRenderer(worldController);
 				// Game world is active on start
 				paused = false;
-				clientSocket.start();
-
-				// For consistency, the classes to be sent over the network are
-				// registered by the same method for both the client and server.
-				Network.register(clientSocket);
-
-				listener = new Listener() {
-					public void connected(Connection connection) {
-						RegisterName registerName = new RegisterName();
-						registerName.name = "Start";
-						clientSocket.sendTCP(registerName);
-					}
-
-					public void received(Connection connection, Object object) {
-						if (object instanceof Stats) {
-							Stats card = (Stats) object;
-							if(card.getCardAction().equals(Stats.CARD_ACTION_NEW_CARD)){
-								worldController.addCardToGame(card);
-								
-							}else if(card.getCardAction().equals(Stats.CARD_ACTION_NEW_ENEMY_CARD)){
-								worldController.addEnemyCardToGame(card);
-								
-								worldController.player.setEnemycardsOnHand(worldController.player.getEnemycardsOnHand()-1);
-							}else if(card.getCardAction().equals(Stats.CARD_ACTION_ATTACKED_CARD)){
-								worldController.setAttackedCardForEnemyAttack(card);
-							}else if(card.getCardAction().equals(Stats.CARD_ACTION_ATTACKING_CARD)){
-								worldController.setAnimatedCardForEnemyAttack(card,false);				
-							}else if(card.getCardAction().equals(Stats.CARD_ACTION_ATTACK_PLAYER)){
-								worldController.setAnimatedCardForEnemyAttack(card,true);
-							}
-							
-							return;
-						}
-
-						if (object instanceof ActionMessage) {
-							ActionMessage receivedAction = (ActionMessage) object;
-							if (receivedAction.action.equals(ActionMessage.START)) {
-								//worldController.startGame = true;
-								clientSocket.sendTCP(receivedAction);
-								return;
-							} else if (receivedAction.action
-									.equals(ActionMessage.PASS_TURN)) {
-								
-								if(worldController.maxCrystals<10 ){
-									worldController.maxCrystals++;
-								}
-								worldController.player.setCrystalsLeft(worldController.maxCrystals);
-								worldController.player.setEnemyCrystalsLeft(worldController.maxCrystals);
-								worldController.player.setYourTurn(true);
-								worldController.resetUsed();
-								
-								
-									
-							}
-							return;
-						}
-
-						if (object instanceof Player) {
-							if(firstTurn){
-								worldController.player=(Player) object;
-								worldController.maxCrystals=worldController.player.getCrystalsLeft();
-								firstTurn=false;
-								worldController.startGame = true;
-							
-							}else{
-								Player receivedData= (Player) object;
-								exchangePlayerData(receivedData, worldController.player);
-								
-							}
-							return;
-						
-						}
-					}
-
-					public void disconnected(Connection connection) {
-						// TODO: volver a la pantalla inicial al desconectar
-					}
-				};
-				clientSocket.addListener(listener);
-				new Thread("Connect") {
-					public void run() {
-						try {
-						//clientSocket.connect(10000, "81.172.115.2", Network.port);
-							clientSocket.connect(10000, "192.168.1.12", Network.port);
-						} catch (IOException ex) {
-							ex.printStackTrace();
-							System.exit(1);
-						}
-					}
-				}.start();
+				
 	}
 
 	@Override
@@ -167,16 +78,113 @@ public class GameScreen extends AbstractGameScreen{
 	@Override
 	public void show() {
 		util.GamePreferences.instance.load();
-		worldController = new WorldController(clientSocket, listener);
+		worldController = new WorldController(clientSocket, listener,game);
 		worldRenderer = new WorldRenderer(worldController);
+		//worldController.startGame=started;
+		clientSocket.start();
+
+		// For consistency, the classes to be sent over the network are
+		// registered by the same method for both the client and server.
+		Network.register(clientSocket);
+
+		listener = new Listener() {
+			public void connected(Connection connection) {
+				RegisterName registerName = new RegisterName();
+				registerName.name = "Start";
+				clientSocket.sendTCP(registerName);
+			}
+
+			public void received(Connection connection, Object object) {
+				if (object instanceof Stats) {
+					Stats card = (Stats) object;
+					if(card.getCardAction().equals(Stats.CARD_ACTION_NEW_CARD)){
+						worldController.addCardToGame(card);
+						
+					}else if(card.getCardAction().equals(Stats.CARD_ACTION_NEW_ENEMY_CARD)){
+						worldController.addEnemyCardToGame(card);
+						
+						worldController.player.setEnemycardsOnHand(worldController.player.getEnemycardsOnHand()-1);
+					}else if(card.getCardAction().equals(Stats.CARD_ACTION_ATTACKED_CARD)){
+						worldController.setAttackedCardForEnemyAttack(card);
+					}else if(card.getCardAction().equals(Stats.CARD_ACTION_ATTACKING_CARD)){
+						worldController.setAnimatedCardForEnemyAttack(card,false);				
+					}else if(card.getCardAction().equals(Stats.CARD_ACTION_ATTACK_PLAYER)){
+						worldController.setAnimatedCardForEnemyAttack(card,true);
+					}
+					
+					return;
+				}
+
+				if (object instanceof ActionMessage) {
+					ActionMessage receivedAction = (ActionMessage) object;
+					if (receivedAction.action.equals(ActionMessage.START)) {
+						//worldController.startGame = true;
+						clientSocket.sendTCP(receivedAction);
+						return;
+					} else if (receivedAction.action
+							.equals(ActionMessage.PASS_TURN)) {
+						
+						if(worldController.maxCrystals<10 ){
+							worldController.maxCrystals++;
+						}
+						worldController.player.setCrystalsLeft(worldController.maxCrystals);
+						worldController.player.setEnemyCrystalsLeft(worldController.maxCrystals);
+						worldController.player.setYourTurn(true);
+						worldController.resetUsed();
+						
+						
+							
+					}else if (receivedAction.action
+							.equals(ActionMessage.DISCONNECT)) {
+						//TODO avisar de que el otro se ha desconectado
+						worldController.disconnect=true;
+					}
+					return;
+				}
+
+				if (object instanceof Player) {
+					if(firstTurn){
+						worldController.player=(Player) object;
+						worldController.maxCrystals=worldController.player.getCrystalsLeft();
+						firstTurn=false;
+						worldController.startGame = true;
+						started=true;
+					
+					}else{
+						Player receivedData= (Player) object;
+						exchangePlayerData(receivedData, worldController.player);
+						
+					}
+					return;
+				
+				}
+			}
+
+			public void disconnected(Connection connection) {
+				// TODO: volver a la pantalla inicial al desconectar
+				game.setScreen(new MenuScreen(game));
+			}
+		};
+		clientSocket.addListener(listener);
+		new Thread("Connect") {
+			public void run() {
+				try {
+				//clientSocket.connect(10000, "81.172.115.2", Network.port);
+					clientSocket.connect(10000, "192.168.1.12", Network.port);
+				} catch (IOException ex) {
+					ex.printStackTrace();
+					//game.setScreen(new MenuScreen(game));
+				}
+			}
+		}.start();
 		Gdx.input.setCatchBackKey(true);
-		
 	}
 
 	@Override
 	public void hide() {
 		worldRenderer.dispose();
 		Gdx.input.setCatchBackKey(false);
+		clientSocket.stop();
 		
 	}
 

@@ -2,6 +2,7 @@ package game;
 
 import gameObjects.Card;
 import util.Constants;
+import util.GamePreferences;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -144,6 +145,7 @@ public class WorldRenderer implements Disposable {
 		batch.setProjectionMatrix(cameraGUI.combined);
 		batch.begin();
 		// draw FPS text (anchored to bottom right edge)
+		if(GamePreferences.instance.showFpsCounter)
 		renderGuiFpsCounter(batch);
 		renderTextGUI();
 		batch.end();

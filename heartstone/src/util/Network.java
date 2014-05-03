@@ -29,7 +29,7 @@ public class Network {
 
 		public static final String START = "a1";
 		public static final String PASS_TURN = "a8";
-                public static final String INIT="a3";
+                public static final String DISCONNECT="a3";
 		public String action;
 	}
 }
