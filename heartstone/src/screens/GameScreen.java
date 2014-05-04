@@ -3,6 +3,7 @@ package screens;
 import java.io.IOException;
 
 import util.AudioManager;
+import util.Constants;
 import util.Network;
 import util.Stats;
 import util.Network.ActionMessage;
@@ -20,6 +21,7 @@ import com.badlogic.gdx.graphics.GL10;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.sun.xml.internal.fastinfoset.algorithm.BuiltInEncodingAlgorithm.WordListener;
 
 public class GameScreen extends AbstractGameScreen{
 	
@@ -29,6 +31,7 @@ public class GameScreen extends AbstractGameScreen{
 	private Client clientSocket;
 	private Listener listener;
 	private boolean firstTurn=true;
+	
 
 	public GameScreen(Game game) {
 		super(game);
@@ -104,6 +107,9 @@ public class GameScreen extends AbstractGameScreen{
 						worldController.addEnemyCardToGame(card);
 						
 						worldController.player.setEnemycardsOnHand(worldController.player.getEnemycardsOnHand()-1);
+						worldController.testSprites[Constants.GUI_POSITION_MANO_UNITS].setRegion(Assets.instance.hitPoint.getNumberRegion(worldController.player.getEnemycardsOnHand()));
+						
+						
 					}else if(card.getCardAction().equals(Stats.CARD_ACTION_ATTACKED_CARD)){
 						worldController.setAttackedCardForEnemyAttack(card);
 					}else if(card.getCardAction().equals(Stats.CARD_ACTION_ATTACKING_CARD)){
@@ -130,7 +136,9 @@ public class GameScreen extends AbstractGameScreen{
 						worldController.player.setCrystalsLeft(worldController.maxCrystals);
 						worldController.player.setEnemyCrystalsLeft(worldController.maxCrystals);
 						worldController.player.setYourTurn(true);
-						worldController.resetUsed();
+						
+						worldController.setGuiNumbers(worldController.testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY_TENS], worldController.testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY_UNITS], worldController.player.getEnemyCrystalsLeft());
+						worldController.setGuiNumbers(worldController.testSprites[Constants.GUI_POSITION_CRISTALES_TENS], worldController.testSprites[Constants.GUI_POSITION_CRISTALES_UNITS], worldController.player.getCrystalsLeft());
 						
 						
 							
@@ -149,6 +157,8 @@ public class GameScreen extends AbstractGameScreen{
 						firstTurn=false;
 						worldController.startGame = true;
 						started=true;
+						worldController.initGuiNumbers();
+						worldController.player.setCardsLeft(22);
 					
 					}else{
 						Player receivedData= (Player) object;
@@ -173,7 +183,7 @@ public class GameScreen extends AbstractGameScreen{
 					clientSocket.connect(10000, "192.168.1.12", Network.port);
 				} catch (IOException ex) {
 					ex.printStackTrace();
-					//game.setScreen(new MenuScreen(game));
+					worldController.message="No se ha podido conectar con el servidor";
 				}
 			}
 		}.start();

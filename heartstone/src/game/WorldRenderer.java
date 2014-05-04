@@ -46,13 +46,13 @@ public class WorldRenderer implements Disposable {
 			worldController.cameraHelper.applyTo(camera);
 			batch.setProjectionMatrix(camera.combined);
 			batch.begin();
-			for(Sprite sprite : worldController.testSprites) {
-			sprite.draw(batch);
-			}
+			
+			worldController.testSprites[0].draw(batch);
+			
 			batch.end();
 			batch.setProjectionMatrix(cameraGUI.combined);
 			batch.begin();
-			Assets.instance.fonts.defaultBig.draw(batch, "Buscando enemigos contra los que enfrentarse", cameraGUI.viewportWidth/4.7f, cameraGUI.viewportHeight/2+20);			
+			Assets.instance.fonts.defaultBig.draw(batch, worldController.message, cameraGUI.viewportWidth/4.7f, cameraGUI.viewportHeight/2+20);			
 			batch.end();
 		}
 		
@@ -64,7 +64,10 @@ public class WorldRenderer implements Disposable {
 			batch.setProjectionMatrix(camera.combined);
 			batch.begin();
 			for(Sprite sprite : worldController.testSprites) {
-			sprite.draw(batch);
+				if(sprite!=null){
+					if(sprite.getTexture()!=null)
+						sprite.draw(batch);
+				}
 			}
 			if(worldController.player.isYourTurn()){
 				worldController.buttonEnemyTurn.draw(batch);
@@ -147,7 +150,7 @@ public class WorldRenderer implements Disposable {
 		// draw FPS text (anchored to bottom right edge)
 		if(GamePreferences.instance.showFpsCounter)
 		renderGuiFpsCounter(batch);
-		renderTextGUI();
+		//renderTextGUI();
 		batch.end();
 		}
 	@Override

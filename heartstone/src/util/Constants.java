@@ -45,12 +45,31 @@ public class Constants {
 	public static final Vector2 ENEMY_PLAYER_BOUNDS = new Vector2(5.4f, 2.2f);
 
 	// Game preferences file
-		public static final String PREFERENCES = "hstone.prefs";
-		public static final String TEXTURE_ATLAS_UI = "images/canyonbunny-ui.pack";
-		public static final String TEXTURE_ATLAS_LIBGDX_UI = "images/uiskin.atlas";
+	public static final String PREFERENCES = "hstone.prefs";
+	public static final String TEXTURE_ATLAS_UI = "images/canyonbunny-ui.pack";
+	public static final String TEXTURE_ATLAS_LIBGDX_UI = "images/uiskin.atlas";
 
-		// Location of description file for skins
-		public static final String SKIN_LIBGDX_UI = "images/uiskin.json";
-		public static final String SKIN_HS_UI = "images/canyonbunny-ui.json";
+	// Location of description file for skins
+	public static final String SKIN_LIBGDX_UI = "images/uiskin.json";
+	public static final String SKIN_HS_UI = "images/canyonbunny-ui.json";
+	
+	//Array position of each gui element
+	public static final int GUI_POSITION_TU_SALUD=4;
+	public static final int GUI_POSITION_TU_SALUD_TENS=5;
+	public static final int GUI_POSITION_TU_SALUD_UNITS=6;
+	public static final int GUI_POSITION_CRISTALES=7;
+	public static final int GUI_POSITION_CRISTALES_TENS=8;
+	public static final int GUI_POSITION_CRISTALES_UNITS=9;
+	public static final int GUI_POSITION_MAZO=10;
+	public static final int GUI_POSITION_MAZO_TENS=11;
+	public static final int GUI_POSITION_MAZO_UNITS=12;
+	public static final int GUI_POSITION_SU_SALUD=13;
+	public static final int GUI_POSITION_SU_SALUD_TENS=14;
+	public static final int GUI_POSITION_SU_SALUD_UNITS=15;
+	public static final int GUI_POSITION_CRISTALES_ENEMY=16;
+	public static final int GUI_POSITION_CRISTALES_ENEMY_TENS=17;
+	public static final int GUI_POSITION_CRISTALES_ENEMY_UNITS=18;
+	public static final int GUI_POSITION_MANO=19;
+	public static final int GUI_POSITION_MANO_UNITS=20;
 
 }
