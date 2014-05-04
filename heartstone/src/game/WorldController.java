@@ -39,7 +39,8 @@ import com.esotericsoftware.kryonet.Listener;
 import com.me.hs.HStone;
 
 public class WorldController extends InputAdapter {
-
+	//TODO controlar que al llegar a 0 la vida no pete al mostrar los numeros
+	//TODO terminar las partidas
 	//The current game
 	public Game game;
 	// The socket used to receive/send data from/to the server
