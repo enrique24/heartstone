@@ -39,19 +39,23 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.me.hs.HStone;
 
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
+
+import com.badlogic.gdx.math.Interpolation;
+
 public class WorldController extends InputAdapter {
-	//TODO controlar que al llegar a 0 la vida no pete al mostrar los numeros
-	//TODO terminar las partidas
-	//The current game
+	// TODO controlar que al llegar a 0 la vida no pete al mostrar los numeros
+	// TODO terminar las partidas
+	// The current game
 	public Game game;
 	// The socket used to receive/send data from/to the server
 	private Client clientSocket;
 	public boolean startGame = false;
 	// Sprites used to render some objects that appear in the game
 	public Sprite[] testSprites;
-	 ArrayList<Card> cardsHand = new ArrayList<Card>();
-	 ArrayList<Card> cardsTable = new ArrayList<Card>();
-	 ArrayList<Card> cardsEnemy = new ArrayList<Card>();
+	ArrayList<Card> cardsHand = new ArrayList<Card>();
+	ArrayList<Card> cardsTable = new ArrayList<Card>();
+	ArrayList<Card> cardsEnemy = new ArrayList<Card>();
 	public CameraHelper cameraHelper;
 	public ArrayList<Stats> cardStats = new ArrayList<Stats>();
 	public Player player;
@@ -79,19 +83,21 @@ public class WorldController extends InputAdapter {
 	public boolean reorderEnemyCards = false;
 	// boolean used to start the animation of bringing a new card to the game
 	public boolean addNewCard = false;
-	//boolean used to start the animation of loosing a card if you have the max amount of card allowed on hand
-	public boolean looseCard=false;
-	//booleans used for playing sound purposes
-	public boolean playMoveCardSound=true;
-	public boolean playDieSound=true;
-	public boolean playAttackSound=false;
-	public boolean playTurnTimeEnding=true;
-	//TODO a lo mejor algun booleano para sonido mas, poner que el sonido y la musica se actualicen enseguida
-	public boolean disconnect=false;
+	// boolean used to start the animation of loosing a card if you have the max
+	// amount of card allowed on hand
+	public boolean looseCard = false;
+	// booleans used for playing sound purposes
+	public boolean playMoveCardSound = true;
+	public boolean playDieSound = true;
+	public boolean playAttackSound = false;
+	public boolean playTurnTimeEnding = true;
+	// TODO a lo mejor algun booleano para sonido mas, poner que el sonido y la
+	// musica se actualicen enseguida
+	public boolean disconnect = false;
 	// Card that is going to have an animation
 	Card animatedCard;
 	// Card that is going to be attacked
-	Card attackedCard,attackingCard;
+	Card attackedCard, attackingCard;
 	// position on the table of the attacking card
 	int attackingCardPosition;
 	// Vector used to translate the cards
@@ -104,24 +110,24 @@ public class WorldController extends InputAdapter {
 	public ParticleEffect attackParticles2 = new ParticleEffect();
 	// Boolean used to render the attack special effect
 	public boolean attackSpecialEffect = false;
-	//Sprites used to represent buttons to pass the turn to the other player
+	// Sprites used to represent buttons to pass the turn to the other player
 	Sprite buttonPassTurn;
 	Sprite buttonEnemyTurn;
-	//Rectangle that represents the button to pass turn
+	// Rectangle that represents the button to pass turn
 	Rectangle buttonTurn;
-	public int maxCrystals=0;
-	//Message to show to the player at the start
-	public String message="Buscando enemigos contra los que enfrentarse";
-	//variable used to keep track of time since a player receives his turn
+	public int maxCrystals = 0;
+	// Message to show to the player at the start
+	public String message = "Buscando enemigos contra los que enfrentarse";
+	// variable used to keep track of time since a player receives his turn
 	public float turnTime;
-	//boolean used to know when a game has reached its end
-	public boolean gameEnded=false;
-	//Object used to represent the end of a game
+	// boolean used to know when a game has reached its end
+	public boolean gameEnded = false;
+	// Object used to represent the end of a game
 	public Image endImage;
-	
-	
-	public WorldController(Client socket, Listener listener,Game game) {
-		this.game=game;
+	public Image endBackgroundImage;
+
+	public WorldController(Client socket, Listener listener, Game game) {
+		this.game = game;
 		init();
 		this.clientSocket = socket;
 		new Thread("ww") {
@@ -136,8 +142,6 @@ public class WorldController extends InputAdapter {
 				}
 			}
 		}.start();
-		
-	
 
 	}
 
@@ -148,8 +152,9 @@ public class WorldController extends InputAdapter {
 	}
 
 	private void initGameObjects() {
-		// Create new array for 21 sprites for diverse purposes, background, glow effect and the user gui
-		player= new Player(false);
+		// Create new array for 21 sprites for diverse purposes, background,
+		// glow effect and the user gui
+		player = new Player(false);
 		testSprites = new Sprite[21];
 		dyingParticles.load(Gdx.files.internal("particles/desaparecer.pfx"),
 				Gdx.files.internal("particles"));
@@ -162,23 +167,28 @@ public class WorldController extends InputAdapter {
 		attackParticles2.load(Gdx.files.internal("particles/cross2.pfx"),
 				Gdx.files.internal("particles"));
 
-		//glow effect
-		Sprite spr = new Sprite(Assets.instance.carta.getCardRegion("resplandor"));
+		// glow effect
+		Sprite spr = new Sprite(
+				Assets.instance.carta.getCardRegion("resplandor"));
 		spr.setSize(3f, 4.3f);
 		spr.setOrigin(spr.getWidth() / 2.0f, spr.getHeight() / 2.0f);
 		testSprites[1] = spr;
 		testSprites[1].setPosition(11, 11);
-		
-		//Cards that represents the enemy and the player
-		Sprite sprPlayer1= new Sprite(Assets.instance.carta.getCardRegion("jugador"));
+
+		// Cards that represents the enemy and the player
+		Sprite sprPlayer1 = new Sprite(
+				Assets.instance.carta.getCardRegion("jugador"));
 		sprPlayer1.setSize(Constants.CARD_WIDTH, Constants.CARD_HEIGHT);
-		sprPlayer1.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH,Constants.CARD_POSITION_HAND[4].y );
-		testSprites[2]=sprPlayer1;
-		Sprite sprPlayer2= new Sprite(Assets.instance.carta.getCardRegion("jugador"));
+		sprPlayer1.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH, Constants.CARD_POSITION_HAND[4].y);
+		testSprites[2] = sprPlayer1;
+		Sprite sprPlayer2 = new Sprite(
+				Assets.instance.carta.getCardRegion("jugador"));
 		sprPlayer2.setSize(Constants.CARD_WIDTH, Constants.CARD_HEIGHT);
-		sprPlayer2.setPosition(Constants.CARD_POSITION_OPPONENT[4].x+Constants.CARD_WIDTH,Constants.CARD_POSITION_OPPONENT[4].y );
-		testSprites[3]=sprPlayer2;
-		
+		sprPlayer2.setPosition(Constants.CARD_POSITION_OPPONENT[4].x
+				+ Constants.CARD_WIDTH, Constants.CARD_POSITION_OPPONENT[4].y);
+		testSprites[3] = sprPlayer2;
+
 		// Background
 		Sprite spr2 = new Sprite(
 				Assets.instance.carta.getCardRegion("Backgroung"));
@@ -186,51 +196,66 @@ public class WorldController extends InputAdapter {
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
 		spr2.setPosition(-9, -6);
 		testSprites[0] = spr2;
-		
+
 		// Gui Sprites
-		spr2= new Sprite(Assets.instance.carta.getCardRegion("tusalud"));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH+1.4f,Constants.CARD_HIT_NUMBER_HEIGHT+0.2f);
+		spr2 = new Sprite(Assets.instance.carta.getCardRegion("tusalud"));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH + 1.4f,
+				Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f, Constants.CARD_POSITION_HAND[4].y+2.1f);
-		testSprites[Constants.GUI_POSITION_TU_SALUD]=spr2;
-		
-		spr2= new Sprite(Assets.instance.carta.getCardRegion("susalud"));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH+1.4f,Constants.CARD_HIT_NUMBER_HEIGHT+0.2f);
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f,
+				Constants.CARD_POSITION_HAND[4].y + 2.1f);
+		testSprites[Constants.GUI_POSITION_TU_SALUD] = spr2;
+
+		spr2 = new Sprite(Assets.instance.carta.getCardRegion("susalud"));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH + 1.4f,
+				Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f, Constants.CARD_POSITION_OPPONENT[4].y+2.1f);
-		testSprites[Constants.GUI_POSITION_SU_SALUD]=spr2;
-		
-		spr2= new Sprite(Assets.instance.carta.getCardRegion("cristales"));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH+1.4f,Constants.CARD_HIT_NUMBER_HEIGHT+0.2f);
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f,
+				Constants.CARD_POSITION_OPPONENT[4].y + 2.1f);
+		testSprites[Constants.GUI_POSITION_SU_SALUD] = spr2;
+
+		spr2 = new Sprite(Assets.instance.carta.getCardRegion("cristales"));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH + 1.4f,
+				Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f, Constants.CARD_POSITION_HAND[4].y+2.1f-(Constants.CARD_HIT_NUMBER_HEIGHT+0.2f));
-		testSprites[Constants.GUI_POSITION_CRISTALES]=spr2;
-		
-		spr2= new Sprite(Assets.instance.carta.getCardRegion("cristales"));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH+1.4f,Constants.CARD_HIT_NUMBER_HEIGHT+0.2f);
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f,
+				Constants.CARD_POSITION_HAND[4].y + 2.1f
+						- (Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f));
+		testSprites[Constants.GUI_POSITION_CRISTALES] = spr2;
+
+		spr2 = new Sprite(Assets.instance.carta.getCardRegion("cristales"));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH + 1.4f,
+				Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f, Constants.CARD_POSITION_OPPONENT[4].y+2.1f-(Constants.CARD_HIT_NUMBER_HEIGHT+0.2f));
-		testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY]=spr2;
-		
-		spr2= new Sprite(Assets.instance.carta.getCardRegion("mazo"));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH+1.4f,Constants.CARD_HIT_NUMBER_HEIGHT+0.2f);
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f,
+				Constants.CARD_POSITION_OPPONENT[4].y + 2.1f
+						- (Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f));
+		testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY] = spr2;
+
+		spr2 = new Sprite(Assets.instance.carta.getCardRegion("mazo"));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH + 1.4f,
+				Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f, Constants.CARD_POSITION_HAND[4].y+2.1f-((Constants.CARD_HIT_NUMBER_HEIGHT+0.2f)*2));
-		testSprites[Constants.GUI_POSITION_MAZO]=spr2;
-		
-		spr2= new Sprite(Assets.instance.carta.getCardRegion("mano"));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH+1.4f,Constants.CARD_HIT_NUMBER_HEIGHT+0.2f);
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f,
+				Constants.CARD_POSITION_HAND[4].y + 2.1f
+						- ((Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f) * 2));
+		testSprites[Constants.GUI_POSITION_MAZO] = spr2;
+
+		spr2 = new Sprite(Assets.instance.carta.getCardRegion("mano"));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH + 1.4f,
+				Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f, Constants.CARD_POSITION_OPPONENT[4].y+2.1f-((Constants.CARD_HIT_NUMBER_HEIGHT+0.2f)*2));
-		testSprites[Constants.GUI_POSITION_MANO]=spr2;
-		
-		
-		
-		
-		
-		
-		
-		
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f,
+				Constants.CARD_POSITION_OPPONENT[4].y + 2.1f
+						- ((Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f) * 2));
+		testSprites[Constants.GUI_POSITION_MANO] = spr2;
+
 		table = new Rectangle(-9, -1.9f, Constants.CARD_WIDTH * 5,
 				Constants.CARD_HEIGHT);
 		playerBounds = new Rectangle(Constants.PLAYER_BOUNDS.x,
@@ -239,25 +264,29 @@ public class WorldController extends InputAdapter {
 		enemyPlayerBounds = new Rectangle(Constants.ENEMY_PLAYER_BOUNDS.x,
 				Constants.ENEMY_PLAYER_BOUNDS.y, Constants.CARD_WIDTH * 5,
 				Constants.CARD_HEIGHT);
-		buttonEnemyTurn= new Sprite(Assets.instance.carta.getCardRegion("Boton (Turno Enemigo)"));
+		buttonEnemyTurn = new Sprite(
+				Assets.instance.carta.getCardRegion("Boton (Turno Enemigo)"));
 		buttonEnemyTurn.setSize(3.2f, 2.5f);
-		buttonEnemyTurn.setOrigin(buttonEnemyTurn.getWidth()/2f, buttonEnemyTurn.getHeight()/2f);
-		buttonEnemyTurn.setPosition(Constants.CARD_POSITION_TABLE[4].x+3, Constants.CARD_POSITION_TABLE[4].y+1);
-		
-		buttonPassTurn= new Sprite(Assets.instance.carta.getCardRegion("Boton (Pasar Turno)"));
+		buttonEnemyTurn.setOrigin(buttonEnemyTurn.getWidth() / 2f,
+				buttonEnemyTurn.getHeight() / 2f);
+		buttonEnemyTurn.setPosition(Constants.CARD_POSITION_TABLE[4].x + 3,
+				Constants.CARD_POSITION_TABLE[4].y + 1);
+
+		buttonPassTurn = new Sprite(
+				Assets.instance.carta.getCardRegion("Boton (Pasar Turno)"));
 		buttonPassTurn.setSize(3.2f, 2.5f);
-		buttonPassTurn.setOrigin(buttonEnemyTurn.getWidth()/2f, buttonEnemyTurn.getHeight()/2f);
-		buttonPassTurn.setPosition(Constants.CARD_POSITION_TABLE[4].x+3, Constants.CARD_POSITION_TABLE[4].y+1);
-		buttonTurn= new Rectangle(Constants.CARD_POSITION_TABLE[4].x+3, Constants.CARD_POSITION_TABLE[4].y+1, 3.2f, 2.5f);
-		
-		
-		
+		buttonPassTurn.setOrigin(buttonEnemyTurn.getWidth() / 2f,
+				buttonEnemyTurn.getHeight() / 2f);
+		buttonPassTurn.setPosition(Constants.CARD_POSITION_TABLE[4].x + 3,
+				Constants.CARD_POSITION_TABLE[4].y + 1);
+		buttonTurn = new Rectangle(Constants.CARD_POSITION_TABLE[4].x + 3,
+				Constants.CARD_POSITION_TABLE[4].y + 1, 3.2f, 2.5f);
 
 	}
 
 	public void update(float deltaTime) {
 		if (startGame) {
-			if(!gameEnded){
+			if (!gameEnded) {
 				updateBounds();
 				moveCardToTable(deltaTime);
 				reorderHandCardAnimation();
@@ -276,20 +305,22 @@ public class WorldController extends InputAdapter {
 				dyingParticles2.update(deltaTime);
 				attackParticles.update(deltaTime);
 				attackParticles2.update(deltaTime);
-				setGuiNumbers(testSprites[Constants.GUI_POSITION_MAZO_TENS], testSprites[Constants.GUI_POSITION_MAZO_UNITS], player.getCardsLeft());
+				setGuiNumbers(testSprites[Constants.GUI_POSITION_MAZO_TENS],
+						testSprites[Constants.GUI_POSITION_MAZO_UNITS],
+						player.getCardsLeft());
 				autoPassTurn(deltaTime);
 				isGameEnded();
-			}else{
-				if(Gdx.input.justTouched()){	
-						clientSocket.stop();		
-					
+			} else {
+				endImage.act(deltaTime);
+				if (Gdx.input.justTouched()) {
+					clientSocket.stop();
+
 				}
 			}
-		
-			
-		}else{
-			if(message.equals("No se ha podido conectar con el servidor")){
-				if(Gdx.input.isTouched()){
+
+		} else {
+			if (message.equals("No se ha podido conectar con el servidor")) {
+				if (Gdx.input.isTouched()) {
 					game.setScreen(new MenuScreen(game));
 				}
 			}
@@ -352,7 +383,8 @@ public class WorldController extends InputAdapter {
 											* (6) * -1)) {
 								testSprites[1].setPosition(carta.position.x,
 										carta.position.y);
-								AudioManager.instance.play(Assets.instance.sounds.selectCard);
+								AudioManager.instance
+										.play(Assets.instance.sounds.selectCard);
 								// Set as selected the card that has been
 								// touched
 								for (int i = 0; i < cardsHand.size(); i++) {
@@ -394,7 +426,8 @@ public class WorldController extends InputAdapter {
 											* (6) * -1)) {
 								testSprites[1].setPosition(carta.position.x,
 										carta.position.y);
-								AudioManager.instance.play(Assets.instance.sounds.selectCard);
+								AudioManager.instance
+										.play(Assets.instance.sounds.selectCard);
 								for (int i = 0; i < cardsTable.size(); i++) {
 									if (cardsTable.get(i) == carta) {
 										cardsTable.get(i).setSelected(true);
@@ -423,7 +456,7 @@ public class WorldController extends InputAdapter {
 	// Drag a selected card on the hand to the table
 	private void moveCardToTable(float deltaTime) {
 		if (player.isYourTurn()) {
-			if (Gdx.input.justTouched() && cardsTable.size()<5) {
+			if (Gdx.input.justTouched() && cardsTable.size() < 5) {
 				for (int i = 0; i < cardsHand.size(); i++) {
 					if (cardsTable.size() > 0) {
 						// if there is another card on the table set the
@@ -459,15 +492,19 @@ public class WorldController extends InputAdapter {
 									- cardsHand.get(i).getCrystalCost());
 							player.setCardsOntable(player.getCardsOntable() + 1);
 							player.setCardsOnHand(player.getCardsOnHand() - 1);
-							setGuiNumbers(testSprites[Constants.GUI_POSITION_CRISTALES_TENS], testSprites[Constants.GUI_POSITION_CRISTALES_UNITS], player.getCrystalsLeft());
+							setGuiNumbers(
+									testSprites[Constants.GUI_POSITION_CRISTALES_TENS],
+									testSprites[Constants.GUI_POSITION_CRISTALES_UNITS],
+									player.getCrystalsLeft());
 							testSprites[1].setPosition(11, 11);
 							cardsTable.add(cardsHand.get(i));
 							cardsHand.remove(i);
 							moveToTable = true;
 							reorderHandCards = true;
-							AudioManager.instance.play(Assets.instance.sounds.new_card);
-							//send data to server
-							Stats sendCard=getStatsFromCard(animatedCard);
+							AudioManager.instance
+									.play(Assets.instance.sounds.new_card);
+							// send data to server
+							Stats sendCard = getStatsFromCard(animatedCard);
 							sendCard.setCardAction(Stats.CARD_ACTION_NEW_ENEMY_CARD);
 							clientSocket.sendTCP(sendCard);
 							return;
@@ -490,8 +527,7 @@ public class WorldController extends InputAdapter {
 										* -1)) {
 
 						}
-						
-						
+
 					}
 				}
 			}
@@ -551,13 +587,15 @@ public class WorldController extends InputAdapter {
 											.getHeight() / 2))
 											/ (Gdx.graphics.getHeight() / 2)
 											* (6) * -1)) {
-						playAttackSound=true;
+						playAttackSound = true;
 						attackCard = true;
 						attackedCard = carta;
-						Stats animatedStats= getStatsFromCard(attackingCard);
-						Stats attackedStats= getStatsFromCard(attackedCard);
-						animatedStats.setCardAction(Stats.CARD_ACTION_ATTACKING_CARD);
-						attackedStats.setCardAction(Stats.CARD_ACTION_ATTACKED_CARD);
+						Stats animatedStats = getStatsFromCard(attackingCard);
+						Stats attackedStats = getStatsFromCard(attackedCard);
+						animatedStats
+								.setCardAction(Stats.CARD_ACTION_ATTACKING_CARD);
+						attackedStats
+								.setCardAction(Stats.CARD_ACTION_ATTACKED_CARD);
 						clientSocket.sendTCP(attackedStats);
 						clientSocket.sendTCP(animatedStats);
 						return;
@@ -574,17 +612,21 @@ public class WorldController extends InputAdapter {
 										* (6)
 										* -1)) {
 					attackCard = true;
-					playAttackSound=true;
+					playAttackSound = true;
 					attackedCard = new Card(null, enemyPlayerBounds.x,
-							enemyPlayerBounds.y, 0, 100, 0,null);
+							enemyPlayerBounds.y, 0, 100, 0, null);
 					player.setEnemyHitPoints(player.getEnemyHitPoints()
 							- attackingCard.getAttackPoints());
-					if(player.getEnemyHitPoints()<0){
+					if (player.getEnemyHitPoints() < 0) {
 						player.setEnemyHitPoints(0);
 					}
-					setGuiNumbers(testSprites[Constants.GUI_POSITION_SU_SALUD_TENS], testSprites[Constants.GUI_POSITION_SU_SALUD_UNITS], player.getEnemyHitPoints());
-					Stats animatedStats= getStatsFromCard(attackingCard);
-					animatedStats.setCardAction(Stats.CARD_ACTION_ATTACK_PLAYER);
+					setGuiNumbers(
+							testSprites[Constants.GUI_POSITION_SU_SALUD_TENS],
+							testSprites[Constants.GUI_POSITION_SU_SALUD_UNITS],
+							player.getEnemyHitPoints());
+					Stats animatedStats = getStatsFromCard(attackingCard);
+					animatedStats
+							.setCardAction(Stats.CARD_ACTION_ATTACK_PLAYER);
 					clientSocket.sendTCP(animatedStats);
 
 				}
@@ -594,18 +636,19 @@ public class WorldController extends InputAdapter {
 	}
 
 	// Method invoked to start an animation which shows an enemy attacking you
-	public void attackFromEnemy(
-			boolean playerAttacked) {
+	public void attackFromEnemy(boolean playerAttacked) {
 		if (playerAttacked) {
 			this.attackedCard = new Card(null, playerBounds.x, playerBounds.y,
-					0, 100, 0,null);
+					0, 100, 0, null);
 			player.setHitPoints(player.getHitPoints()
 					- attackingCard.getAttackPoints());
-			if(player.getHitPoints()<0){
+			if (player.getHitPoints() < 0) {
 				player.setHitPoints(0);
 			}
-			setGuiNumbers(testSprites[Constants.GUI_POSITION_TU_SALUD_TENS], testSprites[Constants.GUI_POSITION_TU_SALUD_UNITS], player.getHitPoints());
-			
+			setGuiNumbers(testSprites[Constants.GUI_POSITION_TU_SALUD_TENS],
+					testSprites[Constants.GUI_POSITION_TU_SALUD_UNITS],
+					player.getHitPoints());
+
 		}
 
 		for (int i = 0; i < cardsEnemy.size(); i++) {
@@ -615,7 +658,7 @@ public class WorldController extends InputAdapter {
 			}
 		}
 		attackCardEnemy = true;
-		playAttackSound=true;
+		playAttackSound = true;
 	}
 
 	// The animation of an enemy card attacking
@@ -645,11 +688,12 @@ public class WorldController extends InputAdapter {
 					attackSpecialEffect = true;
 					attackParticles.start();
 					attackParticles2.start();
-					if(playAttackSound){
-						AudioManager.instance.play(Assets.instance.sounds.attack);
-						playAttackSound=false;
+					if (playAttackSound) {
+						AudioManager.instance
+								.play(Assets.instance.sounds.attack);
+						playAttackSound = false;
 					}
-					
+
 				}
 
 				if (attackingCard.position.y < attackedCard.position.y + 0.1)
@@ -706,9 +750,10 @@ public class WorldController extends InputAdapter {
 					attackSpecialEffect = true;
 					attackParticles.start();
 					attackParticles2.start();
-					if(playAttackSound){
-						AudioManager.instance.play(Assets.instance.sounds.attack);
-						playAttackSound=false;
+					if (playAttackSound) {
+						AudioManager.instance
+								.play(Assets.instance.sounds.attack);
+						playAttackSound = false;
 					}
 				}
 				if (attackingCard.position.y > attackedCard.position.y - 0.1)
@@ -744,7 +789,7 @@ public class WorldController extends InputAdapter {
 	private void attacksLogic(Card yourCard, Card enemyCard) {
 		// your card new stats
 		TextureRegion regNumber;
-		playDieSound=true;
+		playDieSound = true;
 		if (yourCard.getDefensePoints() - enemyCard.getAttackPoints() > 0) {
 			yourCard.setDefensePoints(yourCard.getDefensePoints()
 					- enemyCard.getAttackPoints());
@@ -774,7 +819,7 @@ public class WorldController extends InputAdapter {
 	// Animation for a card that is going to die
 	private void cardDiesAnimation() {
 		if (dyingCard) {
-			
+
 			// only the attackingCard or the attacked card are the ones that can
 			// die
 			if (attackingCard.getDefensePoints() == 0) {
@@ -782,9 +827,9 @@ public class WorldController extends InputAdapter {
 						attackingCard.position.y + 2.1f);
 				dyingParticles.start();
 				attackingCard.setAlpha(attackingCard.getAlpha() - 0.01f);
-				if(playDieSound)
-				AudioManager.instance.play(Assets.instance.sounds.dead_guy);
-				playDieSound=false;
+				if (playDieSound)
+					AudioManager.instance.play(Assets.instance.sounds.dead_guy);
+				playDieSound = false;
 			}
 			if (attackingCard.getAlpha() < 0) {
 				cardsEnemy.remove(attackingCard);
@@ -805,9 +850,9 @@ public class WorldController extends InputAdapter {
 						attackedCard.position.y + 2.1f);
 				dyingParticles2.start();
 				attackedCard.setAlpha(attackedCard.getAlpha() - 0.01f);
-				if(playDieSound)
+				if (playDieSound)
 					AudioManager.instance.play(Assets.instance.sounds.dead_guy);
-				playDieSound=false;
+				playDieSound = false;
 			}
 			if (attackedCard.getAlpha() < 0) {
 				cardsEnemy.remove(attackedCard);
@@ -836,14 +881,15 @@ public class WorldController extends InputAdapter {
 	private void reorderHandCardAnimation() {
 		if (reorderHandCards) {
 			// if there is no cards there is no need to reorder them
-			if (cardsHand.size() ==0 ) {
+			if (cardsHand.size() == 0) {
 				reorderHandCards = false;
 				return;
 			}
 			for (int i = 0; i < cardsHand.size(); i++) {
-				if(i<5){
-					if(playMoveCardSound)
-						AudioManager.instance.play(Assets.instance.sounds.new_card);
+				if (i < 5) {
+					if (playMoveCardSound)
+						AudioManager.instance
+								.play(Assets.instance.sounds.new_card);
 					v2Velocity.set(
 							Constants.CARD_POSITION_HAND[i].x
 									- cardsHand.get(i).position.x,
@@ -858,18 +904,18 @@ public class WorldController extends InputAdapter {
 						if (cardsHand.get(i).position.x < Constants.CARD_POSITION_HAND[i].x + 0.02) {
 							cardsHand.get(i).position.x = Constants.CARD_POSITION_HAND[i].x;
 							reorderHandCards = false;
-							playMoveCardSound=true;
+							playMoveCardSound = true;
 							return;
 						}
 
 					}
-				}else{
-					looseCard=true;
-					reorderHandCards=false;
+				} else {
+					looseCard = true;
+					reorderHandCards = false;
 				}
-				
+
 			}
-			playMoveCardSound=false;
+			playMoveCardSound = false;
 		}
 	}
 
@@ -912,7 +958,7 @@ public class WorldController extends InputAdapter {
 				return;
 			}
 			for (int i = 0; i < cardsEnemy.size(); i++) {
-				if(playMoveCardSound)
+				if (playMoveCardSound)
 					AudioManager.instance.play(Assets.instance.sounds.new_card);
 				v2Velocity.set(
 						Constants.CARD_POSITION_OPPONENT[i].x
@@ -927,12 +973,12 @@ public class WorldController extends InputAdapter {
 					if (cardsEnemy.get(i).position.x < Constants.CARD_POSITION_OPPONENT[i].x + 0.02) {
 						cardsEnemy.get(i).position.x = Constants.CARD_POSITION_OPPONENT[i].x;
 						reorderEnemyCards = false;
-						playMoveCardSound=true;
+						playMoveCardSound = true;
 						return;
 					}
 				}
 			}
-			playMoveCardSound=false;
+			playMoveCardSound = false;
 		}
 	}
 
@@ -944,21 +990,18 @@ public class WorldController extends InputAdapter {
 		Card card = new Card(Assets.instance.carta.getCardRegion(stats
 				.getCardName()), position.x, position.y,
 				stats.getAttackPower(), stats.getHitpoints(),
-				stats.getCrystalCost(),stats
-				.getCardName());
+				stats.getCrystalCost(), stats.getCardName());
 		animatedCard = card;
-	
+
 		cardsHand.add(card);
-		if(cardsHand.size()<6){
-			player.setCardsLeft(player.getCardsLeft()-1);
-			player.setCardsOnHand(player.getCardsOnHand()+1);
+		if (cardsHand.size() < 6) {
+			player.setCardsLeft(player.getCardsLeft() - 1);
+			player.setCardsOnHand(player.getCardsOnHand() + 1);
 			reorderHandCards = true;
-		}else{
-			animatedCard=card;
-			looseCard=true;
+		} else {
+			animatedCard = card;
+			looseCard = true;
 		}
-	
-		
 
 	}
 
@@ -986,29 +1029,35 @@ public class WorldController extends InputAdapter {
 		this.cardsEnemy = cardsEnemy;
 	}
 
-	//add an enemy card to the game card
+	// add an enemy card to the game card
 	public void addEnemyCardToGame(Stats stats) {
 		// creates the card out of sight
 		Vector2 position = new Vector2(15, 0);
 		Card card = new Card(Assets.instance.carta.getCardRegion(stats
 				.getCardName()), position.x, position.y,
 				stats.getAttackPower(), stats.getHitpoints(),
-				stats.getCrystalCost(),stats
-				.getCardName());
+				stats.getCrystalCost(), stats.getCardName());
 		animatedCard = card;
 		cardsEnemy.add(card);
 		reorderEnemyCards = true;
-		player.setEnemyCrystalsLeft(player.getEnemyCrystalsLeft()-card.getCrystalCost());
-		if(player.getEnemyCrystalsLeft()>0)
-			setGuiNumbers(testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY_TENS], testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY_UNITS], player.getEnemyCrystalsLeft());
+		player.setEnemyCrystalsLeft(player.getEnemyCrystalsLeft()
+				- card.getCrystalCost());
+		if (player.getEnemyCrystalsLeft() > 0)
+			setGuiNumbers(
+					testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY_TENS],
+					testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY_UNITS],
+					player.getEnemyCrystalsLeft());
 		else
-			setGuiNumbers(testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY_TENS], testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY_UNITS], 0);
-		
+			setGuiNumbers(
+					testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY_TENS],
+					testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY_UNITS],
+					0);
+
 	}
-	
-	//get the Stats from a card
-	public Stats getStatsFromCard(Card card){
-		Stats cardStats= new Stats();
+
+	// get the Stats from a card
+	public Stats getStatsFromCard(Card card) {
+		Stats cardStats = new Stats();
 		cardStats.setAttackPower(card.getAttackPoints());
 		cardStats.setCardName(card.getCardName());
 		cardStats.setCrystalCost(card.getCrystalCost());
@@ -1016,229 +1065,308 @@ public class WorldController extends InputAdapter {
 		cardStats.setCardName(card.getCardName());
 		return cardStats;
 	}
-	
-	//Pass turn
-	public void passTurn(){
-		if(player.isYourTurn()){
+
+	// Pass turn
+	public void passTurn() {
+		if (player.isYourTurn()) {
 			// do not pass turns while animations are happening
-			if (!moveToTable && !attackCard && !dyingCard
-					&& !attackCardEnemy && !reorderEnemyCards
-					&& !reorderHandCards && !reorderTableCards){
-				if(Gdx.input.justTouched()){
+			if (!moveToTable && !attackCard && !dyingCard && !attackCardEnemy
+					&& !reorderEnemyCards && !reorderHandCards
+					&& !reorderTableCards) {
+				if (Gdx.input.justTouched()) {
 					if (buttonTurn
 							.contains(
 									(float) (Gdx.input.getX() - (Gdx.graphics
 											.getWidth() / 2))
-											/ (Gdx.graphics.getWidth() / 2) * (9),
+											/ (Gdx.graphics.getWidth() / 2)
+											* (9),
 									(float) (Gdx.input.getY() - (Gdx.graphics
 											.getHeight() / 2))
 											/ (Gdx.graphics.getHeight() / 2)
-											* (6)
-											* -1)){
-						
+											* (6) * -1)) {
+
 						player.setYourTurn(false);
-						AudioManager.instance.play(Assets.instance.sounds.pass_turn);
-						ActionMessage msg= new ActionMessage();
-						msg.action=ActionMessage.PASS_TURN;
+						AudioManager.instance
+								.play(Assets.instance.sounds.pass_turn);
+						ActionMessage msg = new ActionMessage();
+						msg.action = ActionMessage.PASS_TURN;
 						clientSocket.sendTCP(msg);
-						if(player.getEnemycardsOnHand()!=5){
-							player.setEnemycardsOnHand(player.getEnemycardsOnHand()+1);		
-							
+						if (player.getEnemycardsOnHand() != 5) {
+							player.setEnemycardsOnHand(player
+									.getEnemycardsOnHand() + 1);
+
 						}
 						resetUsed();
-						testSprites[Constants.GUI_POSITION_MANO_UNITS].setRegion(Assets.instance.hitPoint.getNumberRegion(player.getEnemycardsOnHand()));
-						turnTime=0;
-						playTurnTimeEnding=true;
-							
+						testSprites[Constants.GUI_POSITION_MANO_UNITS]
+								.setRegion(Assets.instance.hitPoint
+										.getNumberRegion(player
+												.getEnemycardsOnHand()));
+						turnTime = 0;
+						playTurnTimeEnding = true;
+
 					}
 				}
 			}
-	
-		}
-	}
-	
-	//animation for a loosed card
-	private void looseCardAnimation(){
-		if(looseCard){
-			// The .set() is setting the distance from the starting position to
-						// end position
-						v2Velocity.set(
-								-12f,
-								Constants.CARD_POSITION_HAND[0].y
-										- animatedCard.position.y);
 
-						v2Velocity.x *= 0.05f; // Set speed of the object
-						v2Velocity.y *= 0.05f;
-						animatedCard.position.add(v2Velocity);
-						if (animatedCard.position.x <-12+0.2f) {
-							looseCard=false;
-							cardsHand.remove(animatedCard);
-						}
 		}
 	}
-	
-	//sets the used state of all the cards in the table to false
-	public void resetUsed(){
-		for(Card card:cardsTable){
+
+	// animation for a loosed card
+	private void looseCardAnimation() {
+		if (looseCard) {
+			// The .set() is setting the distance from the starting position to
+			// end position
+			v2Velocity.set(-12f, Constants.CARD_POSITION_HAND[0].y
+					- animatedCard.position.y);
+
+			v2Velocity.x *= 0.05f; // Set speed of the object
+			v2Velocity.y *= 0.05f;
+			animatedCard.position.add(v2Velocity);
+			if (animatedCard.position.x < -12 + 0.2f) {
+				looseCard = false;
+				cardsHand.remove(animatedCard);
+			}
+		}
+	}
+
+	// sets the used state of all the cards in the table to false
+	public void resetUsed() {
+		for (Card card : cardsTable) {
 			card.setUsed(false);
 		}
 	}
-	
-	//sets the animatedCard given the stats from the enemy card that is going to perform an attack
-	public void setAnimatedCardForEnemyAttack(Stats stat,boolean attackEnemyPlayer){
-		for(Card card: cardsEnemy){
-			if(card.getCardName().equals(stat.getCardName())){
-				attackingCard=card;
+
+	// sets the animatedCard given the stats from the enemy card that is going
+	// to perform an attack
+	public void setAnimatedCardForEnemyAttack(Stats stat,
+			boolean attackEnemyPlayer) {
+		for (Card card : cardsEnemy) {
+			if (card.getCardName().equals(stat.getCardName())) {
+				attackingCard = card;
 				attackFromEnemy(attackEnemyPlayer);
 			}
 		}
 	}
-	//sets the attackedCard given the stats from the server if the card that is going to receive an attack
-	public void setAttackedCardForEnemyAttack(Stats stat){
-		for(Card card: cardsTable){
-			if(card.getCardName().equals(stat.getCardName())){
-				attackedCard=card;
+
+	// sets the attackedCard given the stats from the server if the card that is
+	// going to receive an attack
+	public void setAttackedCardForEnemyAttack(Stats stat) {
+		for (Card card : cardsTable) {
+			if (card.getCardName().equals(stat.getCardName())) {
+				attackedCard = card;
 			}
 		}
 	}
-	private void backToMenu () {
-		//disconnects from server and goes back to the menu screen
-		if(Gdx.input.isKeyPressed(Input.Keys.BACK)|| disconnect){
+
+	private void backToMenu() {
+		// disconnects from server and goes back to the menu screen
+		if (Gdx.input.isKeyPressed(Input.Keys.BACK) || disconnect) {
 			clientSocket.stop();
-			//game.setScreen(new MenuScreen(game));
+			// game.setScreen(new MenuScreen(game));
 		}
-		
-		
+
 	}
-	
-	//Method used to pass the turn to the enemy in case that this player takes too much time using his turn
-	private void autoPassTurn(float deltaTime){
-		if(player.isYourTurn()){
-			turnTime+=deltaTime;
-			if(turnTime>116 && playTurnTimeEnding){
+
+	// Method used to pass the turn to the enemy in case that this player takes
+	// too much time using his turn
+	private void autoPassTurn(float deltaTime) {
+		if (player.isYourTurn()) {
+			turnTime += deltaTime;
+			if (turnTime > 116 && playTurnTimeEnding) {
 				AudioManager.instance.play(Assets.instance.sounds.time_ending);
-				playTurnTimeEnding=false;
+				playTurnTimeEnding = false;
 			}
-			if(turnTime>120){
+			if (turnTime > 120 && !attackCard) {
 				player.setYourTurn(false);
 				AudioManager.instance.play(Assets.instance.sounds.pass_turn);
-				ActionMessage msg= new ActionMessage();
-				msg.action=ActionMessage.PASS_TURN;
+				ActionMessage msg = new ActionMessage();
+				msg.action = ActionMessage.PASS_TURN;
 				clientSocket.sendTCP(msg);
-				if(player.getEnemycardsOnHand()!=5){
-					player.setEnemycardsOnHand(player.getEnemycardsOnHand()+1);		
-					
+				if (player.getEnemycardsOnHand() != 5) {
+					player.setEnemycardsOnHand(player.getEnemycardsOnHand() + 1);
+
 				}
 				resetUsed();
-				testSprites[Constants.GUI_POSITION_MANO_UNITS].setRegion(Assets.instance.hitPoint.getNumberRegion(player.getEnemycardsOnHand()));
-				turnTime=0;
-				playTurnTimeEnding=true;
+				testSprites[Constants.GUI_POSITION_MANO_UNITS]
+						.setRegion(Assets.instance.hitPoint
+								.getNumberRegion(player.getEnemycardsOnHand()));
+				turnTime = 0;
+				playTurnTimeEnding = true;
 			}
 		}
 	}
-	
-	//Method used to know when the game has ended
-	private void isGameEnded(){
-		if(player.getHitPoints()<1){
-			//loose
-			endImage= new Image(Assets.instance.carta.getCardRegion("derrota"));
-			endImage.setSize(Constants.VIEWPORT_WIDTH+4, Constants.VIEWPORT_HEIGHT+2);
-			endImage.setOrigin(endImage.getWidth()/2f, endImage.getHeight()/2f);
-			endImage.setPosition(-9.8f, -7f);
+
+	// Method used to know when the game has ended
+	private void isGameEnded() {
+		if (player.getHitPoints() < 1
+				&& (!moveToTable && !attackCard && !dyingCard
+						&& !attackCardEnemy && !reorderEnemyCards
+						&& !reorderHandCards && !reorderTableCards)) {
+			setEndingImage("derrota");
 			AudioManager.instance.play(Assets.instance.sounds.loose);
-			gameEnded=true;
+			gameEnded = true;
 		}
-		if(player.getEnemyHitPoints()<1){
-			//win
-			endImage= new Image(Assets.instance.carta.getCardRegion("derrota"));
-			endImage.setSize(Constants.VIEWPORT_WIDTH+4, Constants.VIEWPORT_HEIGHT+2);
-			endImage.setOrigin(endImage.getWidth()/2f, endImage.getHeight()/2f);
-			endImage.setPosition(-9.8f, -7f);
+		if (player.getEnemyHitPoints() < 1
+				&& (!moveToTable && !attackCard && !dyingCard
+						&& !attackCardEnemy && !reorderEnemyCards
+						&& !reorderHandCards && !reorderTableCards)) {
+			// TODO: cambiar por la imagen de victoria
+			setEndingImage("derrota");
 			AudioManager.instance.play(Assets.instance.sounds.win);
-			gameEnded=true;
+			gameEnded = true;
 		}
 	}
-	
-	//Sets the correct number to display in the chosen part of the gui
-	public void setGuiNumbers(Sprite tens, Sprite units, int stat){
-		if(stat<10){
+
+	private void setEndingImage(String imageName) {
+		// Alpha=0.6 black background
+		endBackgroundImage = new Image(
+				Assets.instance.carta.getCardRegion("derrotabackground"));
+		endBackgroundImage.setSize(Constants.VIEWPORT_WIDTH + 4,
+				Constants.VIEWPORT_HEIGHT + 2);
+		endBackgroundImage.setOrigin(endBackgroundImage.getWidth() / 2f,
+				endBackgroundImage.getHeight() / 2f);
+		endBackgroundImage.setPosition(-9.8f, -7f);
+		// win or loose image
+		endImage = new Image(Assets.instance.carta.getCardRegion(imageName));
+		endImage.setSize(Constants.VIEWPORT_WIDTH + 4,
+				Constants.VIEWPORT_HEIGHT + 2);
+		endImage.setOrigin(endImage.getWidth() / 2f, endImage.getHeight() / 2f);
+		endImage.setPosition(-40f, -40f);
+		endImage.addAction(sequence(
+				scaleTo(0, 0),
+				fadeOut(0),
+				parallel(moveTo(-9.8f, -7f),scaleTo(1.0f, 1.0f, 1f, Interpolation.linear),
+						alpha(1.0f, 1f))));
+		
+
+	}
+
+	// Sets the correct number to display in the chosen part of the gui
+	public void setGuiNumbers(Sprite tens, Sprite units, int stat) {
+		if (stat < 10) {
 			tens.setRegion(Assets.instance.hitPoint.getNumberRegion(0));
 			units.setRegion(Assets.instance.hitPoint.getNumberRegion(stat));
-		}else{
-			tens.setRegion(Assets.instance.hitPoint.getNumberRegion((int)(stat/10)));
-			units.setRegion(Assets.instance.hitPoint.getNumberRegion(stat%10));
+		} else {
+			tens.setRegion(Assets.instance.hitPoint
+					.getNumberRegion((int) (stat / 10)));
+			units.setRegion(Assets.instance.hitPoint.getNumberRegion(stat % 10));
 		}
 	}
-	
-	//initializes the gui numbers
-	public void initGuiNumbers(){
-		//Tu salud
-		Sprite spr2= new Sprite(Assets.instance.hitPoint.getNumberRegion(3));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,Constants.CARD_HIT_NUMBER_HEIGHT);
+
+	// initializes the gui numbers
+	public void initGuiNumbers() {
+		// Tu salud
+		Sprite spr2 = new Sprite(Assets.instance.hitPoint.getNumberRegion(3));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,
+				Constants.CARD_HIT_NUMBER_HEIGHT);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f+Constants.CARD_HIT_NUMBER_WIDTH+1.4f, Constants.CARD_POSITION_HAND[4].y+2.2f);
-		testSprites[Constants.GUI_POSITION_TU_SALUD_TENS]=spr2;
-		spr2= new Sprite(Assets.instance.hitPoint.getNumberRegion(0));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,Constants.CARD_HIT_NUMBER_HEIGHT);
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f + Constants.CARD_HIT_NUMBER_WIDTH
+				+ 1.4f, Constants.CARD_POSITION_HAND[4].y + 2.2f);
+		testSprites[Constants.GUI_POSITION_TU_SALUD_TENS] = spr2;
+		spr2 = new Sprite(Assets.instance.hitPoint.getNumberRegion(0));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,
+				Constants.CARD_HIT_NUMBER_HEIGHT);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f+(Constants.CARD_HIT_NUMBER_WIDTH*2)+1.4f, Constants.CARD_POSITION_HAND[4].y+2.2f);
-		testSprites[Constants.GUI_POSITION_TU_SALUD_UNITS]=spr2;
-		
-		//Su salud
-		spr2= new Sprite(Assets.instance.hitPoint.getNumberRegion(3));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,Constants.CARD_HIT_NUMBER_HEIGHT);
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f
+				+ (Constants.CARD_HIT_NUMBER_WIDTH * 2) + 1.4f,
+				Constants.CARD_POSITION_HAND[4].y + 2.2f);
+		testSprites[Constants.GUI_POSITION_TU_SALUD_UNITS] = spr2;
+
+		// Su salud
+		spr2 = new Sprite(Assets.instance.hitPoint.getNumberRegion(3));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,
+				Constants.CARD_HIT_NUMBER_HEIGHT);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f+Constants.CARD_HIT_NUMBER_WIDTH+1.4f, Constants.CARD_POSITION_OPPONENT[4].y+2.2f);
-		testSprites[Constants.GUI_POSITION_SU_SALUD_TENS]=spr2;
-		spr2= new Sprite(Assets.instance.hitPoint.getNumberRegion(0));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,Constants.CARD_HIT_NUMBER_HEIGHT);
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f + Constants.CARD_HIT_NUMBER_WIDTH
+				+ 1.4f, Constants.CARD_POSITION_OPPONENT[4].y + 2.2f);
+		testSprites[Constants.GUI_POSITION_SU_SALUD_TENS] = spr2;
+		spr2 = new Sprite(Assets.instance.hitPoint.getNumberRegion(0));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,
+				Constants.CARD_HIT_NUMBER_HEIGHT);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f+(Constants.CARD_HIT_NUMBER_WIDTH*2)+1.4f, Constants.CARD_POSITION_OPPONENT[4].y+2.2f);
-		testSprites[Constants.GUI_POSITION_SU_SALUD_UNITS]=spr2;
-		
-		//Cristales enemy
-		spr2= new Sprite(Assets.instance.hitPoint.getNumberRegion(0));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,Constants.CARD_HIT_NUMBER_HEIGHT);
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f
+				+ (Constants.CARD_HIT_NUMBER_WIDTH * 2) + 1.4f,
+				Constants.CARD_POSITION_OPPONENT[4].y + 2.2f);
+		testSprites[Constants.GUI_POSITION_SU_SALUD_UNITS] = spr2;
+
+		// Cristales enemy
+		spr2 = new Sprite(Assets.instance.hitPoint.getNumberRegion(0));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,
+				Constants.CARD_HIT_NUMBER_HEIGHT);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f+Constants.CARD_HIT_NUMBER_WIDTH+1.4f, Constants.CARD_POSITION_OPPONENT[4].y+2.2f-(Constants.CARD_HIT_NUMBER_HEIGHT+0.2f));
-		testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY_TENS]=spr2;
-		spr2= new Sprite(Assets.instance.hitPoint.getNumberRegion(1));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,Constants.CARD_HIT_NUMBER_HEIGHT);
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f + Constants.CARD_HIT_NUMBER_WIDTH
+				+ 1.4f, Constants.CARD_POSITION_OPPONENT[4].y + 2.2f
+				- (Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f));
+		testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY_TENS] = spr2;
+		spr2 = new Sprite(Assets.instance.hitPoint.getNumberRegion(1));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,
+				Constants.CARD_HIT_NUMBER_HEIGHT);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f+(Constants.CARD_HIT_NUMBER_WIDTH*2)+1.4f, Constants.CARD_POSITION_OPPONENT[4].y+2.2f-(Constants.CARD_HIT_NUMBER_HEIGHT+0.2f));
-		testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY_UNITS]=spr2;
-		
-		//Cristales
-		spr2= new Sprite(Assets.instance.hitPoint.getNumberRegion(0));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,Constants.CARD_HIT_NUMBER_HEIGHT);
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f
+				+ (Constants.CARD_HIT_NUMBER_WIDTH * 2) + 1.4f,
+				Constants.CARD_POSITION_OPPONENT[4].y + 2.2f
+						- (Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f));
+		testSprites[Constants.GUI_POSITION_CRISTALES_ENEMY_UNITS] = spr2;
+
+		// Cristales
+		spr2 = new Sprite(Assets.instance.hitPoint.getNumberRegion(0));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,
+				Constants.CARD_HIT_NUMBER_HEIGHT);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f+Constants.CARD_HIT_NUMBER_WIDTH+1.4f, Constants.CARD_POSITION_HAND[4].y+2.2f-(Constants.CARD_HIT_NUMBER_HEIGHT+0.2f));
-		testSprites[Constants.GUI_POSITION_CRISTALES_TENS]=spr2;
-		spr2= new Sprite(Assets.instance.hitPoint.getNumberRegion(1));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,Constants.CARD_HIT_NUMBER_HEIGHT);
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f + Constants.CARD_HIT_NUMBER_WIDTH
+				+ 1.4f, Constants.CARD_POSITION_HAND[4].y + 2.2f
+				- (Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f));
+		testSprites[Constants.GUI_POSITION_CRISTALES_TENS] = spr2;
+		spr2 = new Sprite(Assets.instance.hitPoint.getNumberRegion(1));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,
+				Constants.CARD_HIT_NUMBER_HEIGHT);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f+(Constants.CARD_HIT_NUMBER_WIDTH*2)+1.4f, Constants.CARD_POSITION_HAND[4].y+2.2f-(Constants.CARD_HIT_NUMBER_HEIGHT+0.2f));
-		testSprites[Constants.GUI_POSITION_CRISTALES_UNITS]=spr2;
-		
-		//mano
-		spr2= new Sprite(Assets.instance.hitPoint.getNumberRegion(2));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,Constants.CARD_HIT_NUMBER_HEIGHT);
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f
+				+ (Constants.CARD_HIT_NUMBER_WIDTH * 2) + 1.4f,
+				Constants.CARD_POSITION_HAND[4].y + 2.2f
+						- (Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f));
+		testSprites[Constants.GUI_POSITION_CRISTALES_UNITS] = spr2;
+
+		// mano
+		spr2 = new Sprite(Assets.instance.hitPoint.getNumberRegion(2));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,
+				Constants.CARD_HIT_NUMBER_HEIGHT);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f+Constants.CARD_HIT_NUMBER_WIDTH+1.4f, Constants.CARD_POSITION_OPPONENT[4].y+2.2f-((Constants.CARD_HIT_NUMBER_HEIGHT+0.2f)*2));
-		testSprites[Constants.GUI_POSITION_MANO_UNITS]=spr2;
-		
-		//mazo
-		spr2= new Sprite(Assets.instance.hitPoint.getNumberRegion(2));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,Constants.CARD_HIT_NUMBER_HEIGHT);
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f + Constants.CARD_HIT_NUMBER_WIDTH
+				+ 1.4f, Constants.CARD_POSITION_OPPONENT[4].y + 2.2f
+				- ((Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f) * 2));
+		testSprites[Constants.GUI_POSITION_MANO_UNITS] = spr2;
+
+		// mazo
+		spr2 = new Sprite(Assets.instance.hitPoint.getNumberRegion(2));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,
+				Constants.CARD_HIT_NUMBER_HEIGHT);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f+Constants.CARD_HIT_NUMBER_WIDTH+1.4f, Constants.CARD_POSITION_HAND[4].y+2.2f-((Constants.CARD_HIT_NUMBER_HEIGHT+0.2f)*2));
-		testSprites[Constants.GUI_POSITION_MAZO_TENS]=spr2;
-		spr2= new Sprite(Assets.instance.hitPoint.getNumberRegion(2));
-		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,Constants.CARD_HIT_NUMBER_HEIGHT);
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f + Constants.CARD_HIT_NUMBER_WIDTH
+				+ 1.4f, Constants.CARD_POSITION_HAND[4].y + 2.2f
+				- ((Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f) * 2));
+		testSprites[Constants.GUI_POSITION_MAZO_TENS] = spr2;
+		spr2 = new Sprite(Assets.instance.hitPoint.getNumberRegion(2));
+		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH,
+				Constants.CARD_HIT_NUMBER_HEIGHT);
 		spr2.setOrigin(spr2.getWidth() / 2.0f, spr2.getHeight() / 2.0f);
-		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x+Constants.CARD_WIDTH+0.1f+(Constants.CARD_HIT_NUMBER_WIDTH*2)+1.4f, Constants.CARD_POSITION_HAND[4].y+2.2f-((Constants.CARD_HIT_NUMBER_HEIGHT+0.2f)*2));
-		testSprites[Constants.GUI_POSITION_MAZO_UNITS]=spr2;
-	
+		spr2.setPosition(Constants.CARD_POSITION_HAND[4].x
+				+ Constants.CARD_WIDTH + 0.1f
+				+ (Constants.CARD_HIT_NUMBER_WIDTH * 2) + 1.4f,
+				Constants.CARD_POSITION_HAND[4].y + 2.2f
+						- ((Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f) * 2));
+		testSprites[Constants.GUI_POSITION_MAZO_UNITS] = spr2;
+
 	}
 
 }

@@ -183,7 +183,6 @@ public class GameScreen extends AbstractGameScreen {
 						started = true;
 						worldController.initGuiNumbers();
 						worldController.player.setCardsLeft(22);
-						worldController.player.setEnemyHitPoints(1);
 
 					} else {
 						Player receivedData = (Player) object;

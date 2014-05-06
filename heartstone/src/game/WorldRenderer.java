@@ -1,5 +1,11 @@
 package game;
 
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.alpha;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.scaleTo;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 import gameObjects.Card;
 import util.Constants;
 import util.GamePreferences;
@@ -9,6 +15,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Disposable;
 import com.sun.xml.internal.fastinfoset.algorithm.BuiltInEncodingAlgorithm.WordListener;
 
@@ -46,6 +53,7 @@ public class WorldRenderer implements Disposable {
 						worldController.cameraHelper.applyTo(camera);
 					batch.setProjectionMatrix(camera.combined);
 					batch.begin();
+					worldController.endBackgroundImage.draw(batch, 1);
 					worldController.endImage.draw(batch, 1);
 					batch.end();
 				}
