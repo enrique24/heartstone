@@ -140,6 +140,7 @@ public class Assets implements Disposable, AssetErrorListener {
 		public final Sound pass_turn;
 		public final Sound loose;
 		public final Sound get_turn;
+		public final Sound time_ending;
 
 		public AssetSounds(AssetManager am) {
 			// attack = am.get("sounds/ataque.wav", Sound.class);
@@ -159,6 +160,8 @@ public class Assets implements Disposable, AssetErrorListener {
 			loose = Gdx.audio.newSound(Gdx.files.internal("sounds/perder.wav"));
 			get_turn = Gdx.audio.newSound(Gdx.files
 					.internal("sounds/recibir_turno.wav"));
+			time_ending=Gdx.audio.newSound(Gdx.files
+					.internal("sounds/agotar_tiempo.wav"));
 		}
 	}
 

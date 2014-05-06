@@ -32,6 +32,7 @@ import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -84,7 +85,8 @@ public class WorldController extends InputAdapter {
 	public boolean playMoveCardSound=true;
 	public boolean playDieSound=true;
 	public boolean playAttackSound=false;
-	//TODO a lo mejor algun booleano para sonido mas
+	public boolean playTurnTimeEnding=true;
+	//TODO a lo mejor algun booleano para sonido mas, poner que el sonido y la musica se actualicen enseguida
 	public boolean disconnect=false;
 	// Card that is going to have an animation
 	Card animatedCard;
@@ -110,7 +112,14 @@ public class WorldController extends InputAdapter {
 	public int maxCrystals=0;
 	//Message to show to the player at the start
 	public String message="Buscando enemigos contra los que enfrentarse";
-
+	//variable used to keep track of time since a player receives his turn
+	public float turnTime;
+	//boolean used to know when a game has reached its end
+	public boolean gameEnded=false;
+	//Object used to represent the end of a game
+	public Image endImage;
+	
+	
 	public WorldController(Client socket, Listener listener,Game game) {
 		this.game=game;
 		init();
@@ -248,27 +257,36 @@ public class WorldController extends InputAdapter {
 
 	public void update(float deltaTime) {
 		if (startGame) {
-			updateBounds();
-			moveCardToTable(deltaTime);
-			reorderHandCardAnimation();
-			looseCardAnimation();
-			attackCardCommand();
-			attackCardAnimation();
-			cardDiesAnimation();
-			reorderTableCardAnimation();
-			reorderEnemyCardAnimation();
-			selectCard();
-			moveCardToTableAnimation(deltaTime);
-			attackFromEnemyAnimation();
-			passTurn();
-			cameraHelper.update(deltaTime);
-			dyingParticles.update(deltaTime);
-			dyingParticles2.update(deltaTime);
-			attackParticles.update(deltaTime);
-			attackParticles2.update(deltaTime);
-
-			setGuiNumbers(testSprites[Constants.GUI_POSITION_MAZO_TENS], testSprites[Constants.GUI_POSITION_MAZO_UNITS], player.getCardsLeft());
-
+			if(!gameEnded){
+				updateBounds();
+				moveCardToTable(deltaTime);
+				reorderHandCardAnimation();
+				looseCardAnimation();
+				attackCardCommand();
+				attackCardAnimation();
+				cardDiesAnimation();
+				reorderTableCardAnimation();
+				reorderEnemyCardAnimation();
+				selectCard();
+				moveCardToTableAnimation(deltaTime);
+				attackFromEnemyAnimation();
+				passTurn();
+				cameraHelper.update(deltaTime);
+				dyingParticles.update(deltaTime);
+				dyingParticles2.update(deltaTime);
+				attackParticles.update(deltaTime);
+				attackParticles2.update(deltaTime);
+				setGuiNumbers(testSprites[Constants.GUI_POSITION_MAZO_TENS], testSprites[Constants.GUI_POSITION_MAZO_UNITS], player.getCardsLeft());
+				autoPassTurn(deltaTime);
+				isGameEnded();
+			}else{
+				if(Gdx.input.justTouched()){	
+						clientSocket.stop();		
+					
+				}
+			}
+		
+			
 		}else{
 			if(message.equals("No se ha podido conectar con el servidor")){
 				if(Gdx.input.isTouched()){
@@ -561,6 +579,9 @@ public class WorldController extends InputAdapter {
 							enemyPlayerBounds.y, 0, 100, 0,null);
 					player.setEnemyHitPoints(player.getEnemyHitPoints()
 							- attackingCard.getAttackPoints());
+					if(player.getEnemyHitPoints()<0){
+						player.setEnemyHitPoints(0);
+					}
 					setGuiNumbers(testSprites[Constants.GUI_POSITION_SU_SALUD_TENS], testSprites[Constants.GUI_POSITION_SU_SALUD_UNITS], player.getEnemyHitPoints());
 					Stats animatedStats= getStatsFromCard(attackingCard);
 					animatedStats.setCardAction(Stats.CARD_ACTION_ATTACK_PLAYER);
@@ -580,6 +601,9 @@ public class WorldController extends InputAdapter {
 					0, 100, 0,null);
 			player.setHitPoints(player.getHitPoints()
 					- attackingCard.getAttackPoints());
+			if(player.getHitPoints()<0){
+				player.setHitPoints(0);
+			}
 			setGuiNumbers(testSprites[Constants.GUI_POSITION_TU_SALUD_TENS], testSprites[Constants.GUI_POSITION_TU_SALUD_UNITS], player.getHitPoints());
 			
 		}
@@ -1023,7 +1047,8 @@ public class WorldController extends InputAdapter {
 						}
 						resetUsed();
 						testSprites[Constants.GUI_POSITION_MANO_UNITS].setRegion(Assets.instance.hitPoint.getNumberRegion(player.getEnemycardsOnHand()));
-						
+						turnTime=0;
+						playTurnTimeEnding=true;
 							
 					}
 				}
@@ -1084,6 +1109,54 @@ public class WorldController extends InputAdapter {
 		}
 		
 		
+	}
+	
+	//Method used to pass the turn to the enemy in case that this player takes too much time using his turn
+	private void autoPassTurn(float deltaTime){
+		if(player.isYourTurn()){
+			turnTime+=deltaTime;
+			if(turnTime>116 && playTurnTimeEnding){
+				AudioManager.instance.play(Assets.instance.sounds.time_ending);
+				playTurnTimeEnding=false;
+			}
+			if(turnTime>120){
+				player.setYourTurn(false);
+				AudioManager.instance.play(Assets.instance.sounds.pass_turn);
+				ActionMessage msg= new ActionMessage();
+				msg.action=ActionMessage.PASS_TURN;
+				clientSocket.sendTCP(msg);
+				if(player.getEnemycardsOnHand()!=5){
+					player.setEnemycardsOnHand(player.getEnemycardsOnHand()+1);		
+					
+				}
+				resetUsed();
+				testSprites[Constants.GUI_POSITION_MANO_UNITS].setRegion(Assets.instance.hitPoint.getNumberRegion(player.getEnemycardsOnHand()));
+				turnTime=0;
+				playTurnTimeEnding=true;
+			}
+		}
+	}
+	
+	//Method used to know when the game has ended
+	private void isGameEnded(){
+		if(player.getHitPoints()<1){
+			//loose
+			endImage= new Image(Assets.instance.carta.getCardRegion("derrota"));
+			endImage.setSize(Constants.VIEWPORT_WIDTH+4, Constants.VIEWPORT_HEIGHT+2);
+			endImage.setOrigin(endImage.getWidth()/2f, endImage.getHeight()/2f);
+			endImage.setPosition(-9.8f, -7f);
+			AudioManager.instance.play(Assets.instance.sounds.loose);
+			gameEnded=true;
+		}
+		if(player.getEnemyHitPoints()<1){
+			//win
+			endImage= new Image(Assets.instance.carta.getCardRegion("derrota"));
+			endImage.setSize(Constants.VIEWPORT_WIDTH+4, Constants.VIEWPORT_HEIGHT+2);
+			endImage.setOrigin(endImage.getWidth()/2f, endImage.getHeight()/2f);
+			endImage.setPosition(-9.8f, -7f);
+			AudioManager.instance.play(Assets.instance.sounds.win);
+			gameEnded=true;
+		}
 	}
 	
 	//Sets the correct number to display in the chosen part of the gui

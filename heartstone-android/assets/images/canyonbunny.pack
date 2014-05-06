@@ -5,308 +5,315 @@ filter: Nearest,Nearest
 repeat: none
 0
   rotate: false
-  xy: 3059, 920
+  xy: 1178, 109
   size: 58, 75
   orig: 58, 75
   offset: 0, 0
   index: -1
 1
   rotate: false
-  xy: 2527, 736
+  xy: 746, 17
   size: 58, 75
   orig: 58, 75
   offset: 0, 0
   index: -1
 2
   rotate: false
-  xy: 2949, 828
+  xy: 3797, 1836
   size: 58, 75
   orig: 58, 75
   offset: 0, 0
   index: -1
 3
   rotate: false
-  xy: 2, 79
+  xy: 3983, 1950
   size: 58, 75
   orig: 58, 75
   offset: 0, 0
   index: -1
 4
   rotate: false
-  xy: 188, 193
+  xy: 3139, 1369
   size: 58, 75
   orig: 58, 75
   offset: 0, 0
   index: -1
 5
   rotate: false
-  xy: 2205, 530
+  xy: 3325, 1483
   size: 58, 75
   orig: 58, 75
   offset: 0, 0
   index: -1
 6
   rotate: false
-  xy: 2391, 644
+  xy: 806, 17
   size: 58, 75
   orig: 58, 75
   offset: 0, 0
   index: -1
 7
   rotate: false
-  xy: 3119, 920
+  xy: 3797, 1759
   size: 58, 75
   orig: 58, 75
   offset: 0, 0
   index: -1
 8
   rotate: false
-  xy: 2587, 736
+  xy: 3857, 1836
   size: 58, 75
   orig: 58, 75
   offset: 0, 0
   index: -1
 9
   rotate: false
-  xy: 2, 2
+  xy: 3139, 1292
   size: 58, 75
   orig: 58, 75
   offset: 0, 0
   index: -1
 Backgroung
   rotate: false
-  xy: 2, 1244
+  xy: 2, 1340
   size: 1281, 685
   orig: 1281, 685
   offset: 0, 0
   index: -1
 Boton (Pasar Turno)
   rotate: false
-  xy: 2, 156
+  xy: 3797, 1913
   size: 184, 112
   orig: 184, 112
   offset: 0, 0
   index: -1
 Boton (Turno Enemigo)
   rotate: false
-  xy: 2205, 607
+  xy: 3139, 1446
   size: 184, 112
   orig: 184, 112
   offset: 0, 0
   index: -1
 archmage
   rotate: false
-  xy: 1285, 1464
+  xy: 2, 186
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 bloodfenraptor
   rotate: false
-  xy: 2, 270
+  xy: 1285, 1053
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 bootybaybodyguard
   rotate: false
-  xy: 351, 777
+  xy: 1634, 1560
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 boulderfistogrepng
   rotate: false
-  xy: 1594, 1464
+  xy: 311, 186
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 chillwindyeti
   rotate: false
-  xy: 660, 777
+  xy: 1943, 1560
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 corehound
   rotate: false
-  xy: 1903, 1464
+  xy: 620, 186
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 cristales
   rotate: false
-  xy: 2205, 905
+  xy: 2, 94
   size: 430, 90
   orig: 430, 90
   offset: 0, 0
   index: -1
 dalaranmage
   rotate: false
-  xy: 969, 777
+  xy: 2252, 1560
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
+derrota
+  rotate: false
+  xy: 2, 653
+  size: 1281, 685
+  orig: 1281, 685
+  offset: 0, 0
+  index: -1
 fencreeper
   rotate: false
-  xy: 2212, 1464
+  xy: 929, 186
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 frostwolfgrunt
   rotate: false
-  xy: 2521, 1464
+  xy: 2561, 1560
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 goldshirefootman
   rotate: false
-  xy: 2830, 1464
+  xy: 2870, 1560
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 ironfurgrizzly
   rotate: false
-  xy: 3139, 1464
+  xy: 3179, 1560
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 jugador
   rotate: false
-  xy: 3448, 1464
+  xy: 3488, 1560
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 koboldgeomancer
   rotate: false
-  xy: 3757, 1464
+  xy: 1285, 586
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 lordofthearena
   rotate: false
-  xy: 1285, 997
+  xy: 1238, 119
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 magmarager
   rotate: false
-  xy: 1594, 997
+  xy: 1547, 119
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 malygos
   rotate: false
-  xy: 1903, 997
+  xy: 1594, 1053
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 mano
   rotate: false
-  xy: 2205, 721
+  xy: 424, 2
   size: 320, 90
   orig: 320, 90
   offset: 0, 0
   index: -1
 mazo
   rotate: false
-  xy: 2627, 813
+  xy: 856, 94
   size: 320, 90
   orig: 320, 90
   offset: 0, 0
   index: -1
 murlockraider
   rotate: false
-  xy: 2212, 997
+  xy: 1594, 586
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 ogremagi
   rotate: false
-  xy: 2521, 997
+  xy: 1903, 1093
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 ragnarosfirelord
   rotate: false
-  xy: 2830, 997
+  xy: 1903, 626
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 resplandor
   rotate: false
-  xy: 2, 737
+  xy: 1285, 1520
   size: 347, 505
   orig: 347, 505
   offset: 0, 0
   index: -1
 rivercrocolisk
   rotate: false
-  xy: 3139, 997
+  xy: 2212, 1093
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 senjinshieldmast
   rotate: false
-  xy: 3448, 997
+  xy: 2212, 626
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 susalud
   rotate: false
-  xy: 2205, 813
+  xy: 2, 2
   size: 420, 90
   orig: 420, 90
   offset: 0, 0
   index: -1
 tusalud
   rotate: false
-  xy: 2637, 905
+  xy: 434, 94
   size: 420, 90
   orig: 420, 90
   offset: 0, 0
   index: -1
 wargolem
   rotate: false
-  xy: 3757, 997
+  xy: 2521, 1093
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 wisp
   rotate: false
-  xy: 1278, 530
+  xy: 2521, 626
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 worgeninfiltrator
   rotate: false
-  xy: 1587, 530
+  xy: 2830, 1093
   size: 307, 465
   orig: 307, 465
   offset: 0, 0
   index: -1
 youngpriestess
   rotate: false
-  xy: 1896, 530
+  xy: 2830, 626
   size: 307, 465
   orig: 307, 465
   offset: 0, 0

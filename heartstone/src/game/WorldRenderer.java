@@ -40,8 +40,17 @@ public class WorldRenderer implements Disposable {
 	}
 	public void render () {
 		if(worldController.startGame){
-		renderTestObjects();
-		renderGui(batch);
+				renderTestObjects();
+				renderGui(batch);
+				if(worldController.gameEnded){
+						worldController.cameraHelper.applyTo(camera);
+					batch.setProjectionMatrix(camera.combined);
+					batch.begin();
+					worldController.endImage.draw(batch, 1);
+					batch.end();
+				}
+	
+		
 		}else{
 			worldController.cameraHelper.applyTo(camera);
 			batch.setProjectionMatrix(camera.combined);
