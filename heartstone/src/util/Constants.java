@@ -12,7 +12,7 @@ public class Constants {
 	// GUI Height
 	public static final float VIEWPORT_GUI_HEIGHT = 480.0f;
 	// Location of description file for texture atlas
-	public static final String TEXTURE_ATLAS_OBJECTS = "images/canyonbunny.pack";
+	public static final String TEXTURE_ATLAS_OBJECTS = "images/heartStone.pack";
 	// Cards width
 	public static final float CARD_WIDTH = 2.8f;
 	// Cards height
@@ -46,7 +46,7 @@ public class Constants {
 
 	// Game preferences file
 	public static final String PREFERENCES = "hstone.prefs";
-	public static final String TEXTURE_ATLAS_UI = "images/canyonbunny-ui.pack";
+	public static final String TEXTURE_ATLAS_UI = "images/heartStone-ui.pack";
 	public static final String TEXTURE_ATLAS_LIBGDX_UI = "images/uiskin.atlas";
 
 	// Location of description file for skins

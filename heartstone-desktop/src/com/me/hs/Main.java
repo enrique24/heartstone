@@ -25,10 +25,10 @@ public class Main {
 			settings.maxHeight = 4096;
 			settings.debug = drawDebugOutline;
 			TexturePacker.process(settings, "assets-raw/images",
-					"../heartstone-android/assets/images", "canyonbunny.pack");
+					"../heartstone-android/assets/images", "heartStone.pack");
 			TexturePacker.process(settings, "assets-raw/images-ui",
 					"../heartstone-android/assets/images",
-					"canyonbunny-ui.pack");
+					"heartStone-ui.pack");
 		}
 		final LwjglApplicationConfiguration cfg = new LwjglApplicationConfiguration();
 		cfg.title = "heartstone";

@@ -38,6 +38,7 @@ public class Assets implements Disposable, AssetErrorListener {
 		assetManager.setErrorListener(this);
 		// load texture atlas
 		assetManager.load(Constants.TEXTURE_ATLAS_OBJECTS, TextureAtlas.class);
+		
 		// start loading assets and wait until finished
 		assetManager.finishLoading();
 		Gdx.app.debug(TAG,
@@ -50,13 +51,15 @@ public class Assets implements Disposable, AssetErrorListener {
 		// enable texture filtering for pixel smoothing
 		for (Texture t : atlas.getTextures())
 			t.setFilter(TextureFilter.Linear, TextureFilter.Linear);
+		
 
-		// create game resource objects
 		carta = new AssetsCards(atlas);
 		hitPoint = new AssetCardHitPoints(atlas);
 		fonts = new AssetFonts();
 		sounds = new AssetSounds(assetManager);
 		music = new AssetMusic(assetManager);
+
+		
 	}
 
 	@Override
@@ -160,7 +163,7 @@ public class Assets implements Disposable, AssetErrorListener {
 			loose = Gdx.audio.newSound(Gdx.files.internal("sounds/perder.wav"));
 			get_turn = Gdx.audio.newSound(Gdx.files
 					.internal("sounds/recibir_turno.wav"));
-			time_ending=Gdx.audio.newSound(Gdx.files
+			time_ending = Gdx.audio.newSound(Gdx.files
 					.internal("sounds/agotar_tiempo.wav"));
 		}
 	}
@@ -169,9 +172,10 @@ public class Assets implements Disposable, AssetErrorListener {
 		public final Music song01;
 
 		public AssetMusic(AssetManager am) {
-			song01=Gdx.audio.newMusic(Gdx.files
-					.internal("music/Hearthstone Soundtrack   Main Title[1].mp3"));
-			
+			song01 = Gdx.audio
+					.newMusic(Gdx.files
+							.internal("music/Hearthstone Soundtrack   Main Title[1].mp3"));
+
 		}
 	}
 

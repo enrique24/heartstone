@@ -1211,7 +1211,7 @@ public class WorldController extends InputAdapter {
 						&& !attackCardEnemy && !reorderEnemyCards
 						&& !reorderHandCards && !reorderTableCards)) {
 			// TODO: cambiar por la imagen de victoria
-			setEndingImage("derrota");
+			setEndingImage("victoria");
 			AudioManager.instance.play(Assets.instance.sounds.win);
 			gameEnded = true;
 		}
