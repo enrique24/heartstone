@@ -77,6 +77,7 @@ public class MenuScreen extends AbstractGameScreen {
 		stage.act(deltaTime);
 		stage.draw();
 		Table.drawDebug(stage);
+		AudioManager.instance.onSettingsUpdated();
 	}
 
 	@Override

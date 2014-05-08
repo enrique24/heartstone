@@ -139,6 +139,7 @@ public class GameScreen extends AbstractGameScreen {
 					if (receivedAction.action.equals(ActionMessage.START)) {
 						// worldController.startGame = true;
 						clientSocket.sendTCP(receivedAction);
+						worldController.message="";
 						return;
 					} else if (receivedAction.action
 							.equals(ActionMessage.PASS_TURN)) {
@@ -169,6 +170,7 @@ public class GameScreen extends AbstractGameScreen {
 							.equals(ActionMessage.DISCONNECT)) {
 						// TODO avisar de que el otro se ha desconectado
 						worldController.player.setEnemyHitPoints(0);
+						worldController.message="Tu enemigo se ha desconectado";
 					}
 					return;
 				}
@@ -197,15 +199,17 @@ public class GameScreen extends AbstractGameScreen {
 			public void disconnected(Connection connection) {
 				game.setScreen(new MenuScreen(game));
 				
+				
 			}
 		};
 		clientSocket.addListener(listener);
 		new Thread("Connect") {
 			public void run() {
 				try {
-					 clientSocket.connect(10000, "81.172.115.2",
-					 Network.port);
-					//clientSocket.connect(10000, "192.168.1.12", Network.port);
+					// clientSocket.connect(10000, "81.172.115.2",
+					 //Network.port);
+				//	clientSocket.connect(10000, "192.168.1.12", Network.port);
+					clientSocket.connect(10000, "85.54.162.213", Network.port);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 					worldController.message = "No se ha podido conectar con el servidor";
@@ -213,6 +217,7 @@ public class GameScreen extends AbstractGameScreen {
 			}
 		}.start();
 		Gdx.input.setCatchBackKey(true);
+		clientSocket.setKeepAliveTCP(8000);
 	}
 
 	@Override

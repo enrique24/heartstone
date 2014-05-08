@@ -56,6 +56,10 @@ public class WorldRenderer implements Disposable {
 					worldController.endBackgroundImage.draw(batch, 1);
 					worldController.endImage.draw(batch, 1);
 					batch.end();
+					batch.setProjectionMatrix(cameraGUI.combined);
+					batch.begin();
+					Assets.instance.fonts.defaultBig.draw(batch, worldController.message, cameraGUI.viewportWidth/4.7f+70, cameraGUI.viewportHeight/2+190);			
+					batch.end();
 				}
 	
 		
