@@ -210,7 +210,7 @@ public class GameScreen extends AbstractGameScreen {
 					// clientSocket.connect(10000, "81.172.115.2",
 					 //Network.port);
 				//	clientSocket.connect(10000, "192.168.1.12", Network.port);
-					clientSocket.connect(10000, "85.54.162.213", Network.port);
+					clientSocket.connect(10000, "85.54.171.49", Network.port);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 					worldController.message = "No se ha podido conectar con el servidor";
