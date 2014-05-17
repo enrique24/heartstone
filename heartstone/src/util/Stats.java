@@ -1,6 +1,11 @@
 package util;
 
-
+/**
+ * Represents the statistics of a card
+ * Used for sending data between server and client
+ * @author Enrique Martín Arenal
+ *
+ */
 public class Stats {
 	private int crystalCost;
 	private int attackPower;

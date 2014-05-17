@@ -1,17 +1,17 @@
 package screens;
 
-import java.io.IOException;
-
-import util.AudioManager;
-import util.Constants;
-import util.Network;
-import util.Stats;
-import util.Network.ActionMessage;
-import util.Network.RegisterName;
 import game.Assets;
 import game.WorldController;
 import game.WorldRenderer;
 import gameObjects.Player;
+
+import java.io.IOException;
+
+import util.Constants;
+import util.Network;
+import util.Network.ActionMessage;
+import util.Network.RegisterName;
+import util.Stats;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
@@ -21,29 +21,30 @@ import com.badlogic.gdx.graphics.GL10;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
-import com.sun.xml.internal.fastinfoset.algorithm.BuiltInEncodingAlgorithm.WordListener;
-
+/**
+ * Starts the game 
+ * @author Enrique Martín Arenal
+ *
+ */
 public class GameScreen extends AbstractGameScreen {
 
 	private WorldController worldController;
 	private WorldRenderer worldRenderer;
-	private boolean paused, started = false;
+	private boolean paused = false;
 	private Client clientSocket;
 	private Listener listener;
 	private boolean firstTurn = true;
 
 	public GameScreen(Game game) {
 		super(game);
-		// TODO puede que sea mejor cambiar lo del constructo al show
 	}
 
 	public GameScreen(final Game game, Client client, Listener listen) {
 		super(game);
 		this.clientSocket = client;
 		this.listener = listen;
-		// Set Libgdx log level to DEBUG
-		// TODO change to LOG_NONE at finish
-		Gdx.app.setLogLevel(Application.LOG_DEBUG);
+		//It can be changed to LOG_DEBUG if needed
+		Gdx.app.setLogLevel(Application.LOG_NONE);
 		// Load assets
 		Assets.instance.init(new AssetManager());
 		// Initialize controller and renderer
@@ -54,6 +55,7 @@ public class GameScreen extends AbstractGameScreen {
 
 	}
 
+	
 	@Override
 	public void render(float deltaTime) {
 		// Do not update game world when paused.
@@ -62,7 +64,7 @@ public class GameScreen extends AbstractGameScreen {
 			// since last rendered frame.
 			worldController.update(Gdx.graphics.getDeltaTime());
 		}
-		// Sets the clear screen color to: Cornflower Blue
+		// Sets the clear screen color to: Black
 		Gdx.gl.glClearColor(0, 0, 0, 0xff / 255.0f);
 		// Clears the screen
 		Gdx.gl.glClear(GL10.GL_COLOR_BUFFER_BIT);
@@ -77,12 +79,12 @@ public class GameScreen extends AbstractGameScreen {
 
 	}
 
+	
 	@Override
 	public void show() {
 		util.GamePreferences.instance.load();
 		worldController = new WorldController(clientSocket, listener, game);
 		worldRenderer = new WorldRenderer(worldController);
-		// worldController.startGame=started;
 		clientSocket.start();
 
 		// For consistency, the classes to be sent over the network are
@@ -96,6 +98,7 @@ public class GameScreen extends AbstractGameScreen {
 				clientSocket.sendTCP(registerName);
 			}
 
+			//received object from the server
 			public void received(Connection connection, Object object) {
 				if (object instanceof Stats) {
 					Stats card = (Stats) object;
@@ -137,7 +140,6 @@ public class GameScreen extends AbstractGameScreen {
 				if (object instanceof ActionMessage) {
 					ActionMessage receivedAction = (ActionMessage) object;
 					if (receivedAction.action.equals(ActionMessage.START)) {
-						// worldController.startGame = true;
 						clientSocket.sendTCP(receivedAction);
 						worldController.message="";
 						return;
@@ -167,8 +169,7 @@ public class GameScreen extends AbstractGameScreen {
 												.getCrystalsLeft());
 
 					} else if (receivedAction.action
-							.equals(ActionMessage.DISCONNECT)) {
-						// TODO avisar de que el otro se ha desconectado
+							.equals(ActionMessage.DISCONNECT)) {			
 						worldController.player.setEnemyHitPoints(0);
 						worldController.message="Tu enemigo se ha desconectado";
 					}
@@ -182,7 +183,6 @@ public class GameScreen extends AbstractGameScreen {
 								.getCrystalsLeft();
 						firstTurn = false;
 						worldController.startGame = true;
-						started = true;
 						worldController.initGuiNumbers();
 						worldController.player.setCardsLeft(22);
 
@@ -196,9 +196,10 @@ public class GameScreen extends AbstractGameScreen {
 				}
 			}
 
+			//Event when disconnect from server
 			public void disconnected(Connection connection) {
-				game.setScreen(new MenuScreen(game));
-				
+				//Go back to the menu screen
+				game.setScreen(new MenuScreen(game));		
 				
 			}
 		};
@@ -248,7 +249,11 @@ public class GameScreen extends AbstractGameScreen {
 		worldRenderer.dispose();
 	}
 
-	// Method used to exchange the data of one player to another
+	/**
+	 *  Method used to exchange the data of one player to another
+	 * @param dataReceived
+	 * @param player
+	 */
 	public void exchangePlayerData(Player dataReceived, Player player) {
 		player.setEnemyCardsOnTable(dataReceived.getCardsOntable());
 		player.setEnemyCrystalsLeft(dataReceived.getCrystalsLeft());

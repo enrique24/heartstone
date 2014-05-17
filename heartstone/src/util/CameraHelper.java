@@ -5,9 +5,14 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 
+/**
+ * This class will assist us to manage and manipulate certain parameters of t
+ * he camera we use to render the game world
+ * @author Enrique Martín Arenal
+ *
+ */
 public class CameraHelper {
 
-	private static final String TAG = CameraHelper.class.getName();
 	private final float MAX_ZOOM_IN = 0.25f;
 	private final float MAX_ZOOM_OUT = 10.0f;
 	private Vector2 position;
@@ -45,7 +50,10 @@ public class CameraHelper {
 	public float getZoom() {
 		return zoom;
 	}
-
+	/**
+	 * The camera will follow the selected target
+	 * @param target the sprite that the camera is going to follow
+	 */
 	public void setTarget(Sprite target) {
 		this.target = target;
 	}
@@ -62,6 +70,10 @@ public class CameraHelper {
 		return hasTarget() && this.target.equals(target);
 	}
 
+	/**
+	 * Takes care of updating the camera's attributes.
+	 * @param camera
+	 */
 	public void applyTo(OrthographicCamera camera) {
 		camera.position.x = position.x;
 		camera.position.y = position.y;

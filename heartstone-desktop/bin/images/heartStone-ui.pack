@@ -1,0 +1,47 @@
+
+heartStone-ui-1.png
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+background
+  rotate: false
+  xy: 2, 75
+  size: 800, 430
+  orig: 800, 430
+  offset: 0, 0
+  index: -1
+info
+  rotate: false
+  xy: 2, 2
+  size: 146, 71
+  orig: 146, 71
+  offset: 0, 0
+  index: -1
+options-dn
+  rotate: false
+  xy: 804, 355
+  size: 150, 150
+  orig: 150, 150
+  offset: 0, 0
+  index: -1
+options-up
+  rotate: false
+  xy: 804, 203
+  size: 150, 150
+  orig: 150, 150
+  offset: 0, 0
+  index: -1
+play-dn
+  rotate: false
+  xy: 956, 355
+  size: 150, 150
+  orig: 150, 150
+  offset: 0, 0
+  index: -1
+play-up
+  rotate: false
+  xy: 956, 203
+  size: 150, 150
+  orig: 150, 150
+  offset: 0, 0
+  index: -1

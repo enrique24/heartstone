@@ -14,7 +14,11 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas.AtlasRegion;
 import com.badlogic.gdx.utils.Disposable;
-
+/**
+ * Class to organize and structure our assets
+ * @author Enrique Martín Arenal
+ *
+ */
 public class Assets implements Disposable, AssetErrorListener {
 	public static final String TAG = Assets.class.getName();
 	public static final Assets instance = new Assets();
@@ -26,12 +30,18 @@ public class Assets implements Disposable, AssetErrorListener {
 	public AssetSounds sounds;
 	public AssetMusic music;
 
-	// singleton: prevent instantiation from other classes
+	/**
+	 *  singleton: prevent instantiation from other classes
+	 */
 	private Assets() {
 		assetManager = new AssetManager();
 		init(assetManager);
 	}
 
+	/**
+	 * Initialization of the class
+	 * @param assetManager
+	 */
 	public void init(AssetManager assetManager) {
 		this.assetManager = assetManager;
 		// set asset manager error handler
@@ -62,6 +72,9 @@ public class Assets implements Disposable, AssetErrorListener {
 		
 	}
 
+	/**
+	 * Dispose all the load assets
+	 */
 	@Override
 	public void dispose() {
 		assetManager.dispose();
@@ -78,6 +91,11 @@ public class Assets implements Disposable, AssetErrorListener {
 
 	}
 
+	/**
+	 * Class used to load assets related with the game screen, specially cards
+	 * @author Enrique Martín Arenal
+	 *
+	 */
 	public class AssetsCards {
 		TextureAtlas atlas;
 
@@ -91,6 +109,11 @@ public class Assets implements Disposable, AssetErrorListener {
 		}
 	}
 
+	/**
+	 * Class used to load assets related with the hit points of a card
+	 * @author Enrique Martín Arenal
+	 *
+	 */
 	public class AssetCardHitPoints {
 
 		TextureAtlas atlas;
@@ -106,6 +129,11 @@ public class Assets implements Disposable, AssetErrorListener {
 		}
 	}
 
+	/**
+	 * Class used to load assets related with the fonts used to write messages on screen
+	 * @author Enrique Martín Arenal
+	 *
+	 */
 	public class AssetFonts {
 		public final BitmapFont defaultSmall;
 		public final BitmapFont defaultNormal;
@@ -133,6 +161,11 @@ public class Assets implements Disposable, AssetErrorListener {
 		}
 	}
 
+	/**
+	 * Class used to load assets related with the sounds the game implements
+	 * @author Enrique Martín Arenal
+	 *
+	 */
 	public class AssetSounds {
 		public final Sound attack;
 		public final Sound selectCard;
@@ -168,6 +201,11 @@ public class Assets implements Disposable, AssetErrorListener {
 		}
 	}
 
+	/**
+	 * Class used to load the music assets
+	 * @author Enrique Martín Arenal
+	 *
+	 */
 	public class AssetMusic {
 		public final Music song01;
 

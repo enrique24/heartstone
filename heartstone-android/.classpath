@@ -8,6 +8,5 @@
 	<classpathentry exported="true" kind="lib" path="/heartstone/libs/gdx.jar" sourcepath="/heartstone/libs/gdx-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/gdx-backend-android.jar" sourcepath="libs/gdx-backend-android-sources.jar"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
-	<classpathentry kind="lib" path="C:/Users/Usuario/Desktop/DAM/DAM 2/AD/libs/kryonet-2.21/jars/production/onejar/kryonet-2.21-all.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

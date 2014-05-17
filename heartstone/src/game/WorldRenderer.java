@@ -1,11 +1,5 @@
 package game;
 
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.alpha;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.scaleTo;
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 import gameObjects.Card;
 import util.Constants;
 import util.GamePreferences;
@@ -15,10 +9,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.utils.Disposable;
-import com.sun.xml.internal.fastinfoset.algorithm.BuiltInEncodingAlgorithm.WordListener;
-
+/**
+ * Class that renders the images of the GameScreen
+ * @author Enrique Martín Arenal
+ *
+ */
 public class WorldRenderer implements Disposable {
 	
 	private OrthographicCamera camera;
@@ -32,7 +28,9 @@ public class WorldRenderer implements Disposable {
 		this.worldController = worldController;
 		init();
 	}
-	
+	/**
+	 * Initializes the elements of this class
+	 */
 	private void init () {
 		batch = new SpriteBatch();
 		camera = new OrthographicCamera(Constants.VIEWPORT_WIDTH,
@@ -45,9 +43,12 @@ public class WorldRenderer implements Disposable {
 				cameraGUI.setToOrtho(true); // flip y-axis
 				cameraGUI.update();
 	}
+	/**
+	 * Renders the game
+	 */
 	public void render () {
 		if(worldController.startGame){
-				renderTestObjects();
+				renderObjects();
 				renderGui(batch);
 				if(worldController.gameEnded){
 						worldController.cameraHelper.applyTo(camera);
@@ -78,8 +79,10 @@ public class WorldRenderer implements Disposable {
 		}
 		
 	}
-	
-	private void renderTestObjects() {
+	/**
+	 * Renders the game objects
+	 */
+	private void renderObjects() {
 		
 			worldController.cameraHelper.applyTo(camera);
 			batch.setProjectionMatrix(camera.combined);
@@ -118,6 +121,11 @@ public class WorldRenderer implements Disposable {
 	
 		
 	}
+	/**
+	 * Handles the resizing of the game
+	 * @param width
+	 * @param height
+	 */
 	public void resize (int width, int height) {
 		camera.viewportWidth = (Constants.VIEWPORT_HEIGHT / height) *
 		width;
@@ -130,7 +138,10 @@ public class WorldRenderer implements Disposable {
 		cameraGUI.update();
 	}
 	
-	//Frames per second counter
+	/**
+	 * Frames per second counter
+	 * @param batch
+	 */
 	private void renderGuiFpsCounter (SpriteBatch batch) {
 		float x = cameraGUI.viewportWidth - 55;
 		float y = cameraGUI.viewportHeight - 15;
@@ -150,30 +161,22 @@ public class WorldRenderer implements Disposable {
 		fpsFont.setColor(1, 1, 1, 1); // white
 		}
 	
-	//Displays the current state of a game
-	private void renderTextGUI(){
-		//Data of the enemy
-		Assets.instance.fonts.defaultBig.draw(batch, "Tu salud:"+worldController.player.getHitPoints(), cameraGUI.viewportWidth - 140, cameraGUI.viewportHeight - 135);
-		Assets.instance.fonts.defaultBig.draw(batch, "Cristales:"+worldController.player.getCrystalsLeft(), cameraGUI.viewportWidth - 140, cameraGUI.viewportHeight - 90);
-		Assets.instance.fonts.defaultBig.draw(batch, "Mazo:"+worldController.player.getCardsLeft(), cameraGUI.viewportWidth - 140, cameraGUI.viewportHeight -45);
-		
-		//Data of the player
-		Assets.instance.fonts.defaultBig.draw(batch, "Su salud:"+worldController.player.getEnemyHitPoints(), cameraGUI.viewportWidth - 140, cameraGUI.viewportHeight - 470);
-		Assets.instance.fonts.defaultBig.draw(batch, "Cristales:"+worldController.player.getEnemyCrystalsLeft(), cameraGUI.viewportWidth - 140, cameraGUI.viewportHeight - 425);
-		Assets.instance.fonts.defaultBig.draw(batch, "Mano:"+worldController.player.getEnemycardsOnHand(), cameraGUI.viewportWidth - 140, cameraGUI.viewportHeight -380);
-		
-	}
 
-	//Renders the GUI , 
+	/**
+	 * Renders the GUI , 
+	 * @param batch
+	 */
 	private void renderGui (SpriteBatch batch) {
 		batch.setProjectionMatrix(cameraGUI.combined);
 		batch.begin();
 		// draw FPS text (anchored to bottom right edge)
 		if(GamePreferences.instance.showFpsCounter)
 		renderGuiFpsCounter(batch);
-		//renderTextGUI();
 		batch.end();
 		}
+	/**
+	 * Dispose the elements needed
+	 */
 	@Override
 	public void dispose () {
 		batch.dispose();

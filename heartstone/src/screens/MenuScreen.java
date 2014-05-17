@@ -1,7 +1,6 @@
 
 package screens;
 
-import game.Assets;
 import util.AudioManager;
 import util.Constants;
 import util.GamePreferences;
@@ -18,7 +17,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
-import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
@@ -27,12 +25,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.tablelayout.Cell;
 
 
 public class MenuScreen extends AbstractGameScreen {
-
-	private static final String TAG = MenuScreen.class.getName();
 
 	private Stage stage;
 	private Skin skinHS;
@@ -186,14 +181,14 @@ public class MenuScreen extends AbstractGameScreen {
 		// + Checkbox, "Sound" label, sound volume slider
 		chkSound = new CheckBox("", skinLibgdx);
 		tbl.add(chkSound);
-		tbl.add(new Label("Sound", skinLibgdx));
+		tbl.add(new Label("Sonidos", skinLibgdx));
 		sldSound = new Slider(0.0f, 1.0f, 0.1f, false, skinLibgdx);
 		tbl.add(sldSound);
 		tbl.row();
 		// + Checkbox, "Music" label, music volume slider
 		chkMusic = new CheckBox("", skinLibgdx);
 		tbl.add(chkMusic);
-		tbl.add(new Label("Music", skinLibgdx));
+		tbl.add(new Label("Música", skinLibgdx));
 		sldMusic = new Slider(0.0f, 1.0f, 0.1f, false, skinLibgdx);
 		tbl.add(sldMusic);
 		tbl.row();
@@ -211,7 +206,7 @@ public class MenuScreen extends AbstractGameScreen {
 		tbl.columnDefaults(1).padRight(10);
 		// + Checkbox, "Show FPS Counter" label
 		chkShowFpsCounter = new CheckBox("", skinLibgdx);
-		tbl.add(new Label("Show FPS Counter", skinLibgdx));
+		tbl.add(new Label("Mostar Contador FPS", skinLibgdx));
 		chkShowFpsCounter.scale(2);
 		tbl.add(chkShowFpsCounter);
 		tbl.row();
@@ -235,7 +230,7 @@ public class MenuScreen extends AbstractGameScreen {
 		tbl.add(lbl).colspan(2).height(1).width(220).pad(0, 1, 5, 0);
 		tbl.row();
 		// + Save Button with event handler
-		btnWinOptSave = new TextButton("Save", skinLibgdx);
+		btnWinOptSave = new TextButton("Guardar", skinLibgdx);
 		tbl.add(btnWinOptSave).padRight(30);
 		btnWinOptSave.addListener(new ChangeListener() {
 			@Override
@@ -244,7 +239,7 @@ public class MenuScreen extends AbstractGameScreen {
 			}
 		});
 		// + Cancel Button with event handler
-		btnWinOptCancel = new TextButton("Cancel", skinLibgdx);
+		btnWinOptCancel = new TextButton("Cancelar", skinLibgdx);
 		tbl.add(btnWinOptCancel);
 		btnWinOptCancel.addListener(new ChangeListener() {
 			@Override
@@ -257,7 +252,7 @@ public class MenuScreen extends AbstractGameScreen {
 	}
 
 	private Table buildOptionsWindowLayer () {
-		winOptions = new Window("Options", skinLibgdx);
+		winOptions = new Window("Opciones", skinLibgdx);
 		// + Audio Settings: Sound/Music CheckBox and Volume Slider
 		winOptions.add(buildOptWinAudioSettings()).row();		
 		// + Debug: Show FPS Counter
@@ -277,11 +272,17 @@ public class MenuScreen extends AbstractGameScreen {
 		return winOptions;
 	}
 
+	/**
+	 * Starts the game when the play button is clicked
+	 */
 	private void onPlayClicked () {
 		Client client = new Client();
 		game.setScreen(new GameScreen(game,client,null));
 	}
 
+	/**
+	 * Shows the options window when the options button is clicked
+	 */
 	private void onOptionsClicked () {
 		loadSettings();
 		btnMenuPlay.setVisible(false);
@@ -289,18 +290,26 @@ public class MenuScreen extends AbstractGameScreen {
 		winOptions.setVisible(true);
 	}
 
+	/**
+	 * Save the settings
+	 */
 	private void onSaveClicked () {
 		saveSettings();
 		onCancelClicked();
 	}
 
+	/**
+	 * Hides the options menu and show again the play and options buttons
+	 */
 	private void onCancelClicked () {
 		btnMenuPlay.setVisible(true);
 		btnMenuOptions.setVisible(true);
 		winOptions.setVisible(false);
 	}
 
-
+	/**
+	 * Loads the settings from a file
+	 */
 	private void loadSettings () {
 		GamePreferences prefs = GamePreferences.instance;
 		prefs.load();
@@ -311,6 +320,9 @@ public class MenuScreen extends AbstractGameScreen {
 		chkShowFpsCounter.setChecked(prefs.showFpsCounter);
 	}
 
+	/**
+	 * Saves the settings to a file
+	 */
 	private void saveSettings () {
 		GamePreferences prefs = GamePreferences.instance;
 		prefs.sound = chkSound.isChecked();

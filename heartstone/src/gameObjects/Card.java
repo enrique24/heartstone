@@ -3,25 +3,38 @@ package gameObjects;
 import game.Assets;
 import util.Constants;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
-
+/**
+ * Represents a card
+ * @author Enrique Martín Arenal
+ *
+ */
 public class Card extends AbstractGameObject{
 	
 	private TextureRegion regCard;
 	private int attackPoints;
 	private int defensePoints;
 	private int crystalCost;
-	//Used to know whether the card is currently visible or not
+	/**
+	 * Used to know whether the card is currently visible or not
+	 */
 	private boolean onTheTable;
-	//Used to know if the card has been already used during the turn
+	/**
+	 * Used to know if the card has been already used during the turn
+	 */
 	private boolean used;
-	//Used to know if the card is currently selected or not
+	/**
+	 * Used to know if the card is currently selected or not
+	 */
 	private boolean selected;
+	/**
+	 * Object that represents the hitpoints of the card
+	 */
 	private CardPointNumber hitPoint;
+	/**
+	 * Used to know when to stop the dying animation
+	 */
 	private float alpha;
 	private String cardName;
 	
@@ -62,14 +75,7 @@ public class Card extends AbstractGameObject{
 	public void render(SpriteBatch batch) {
 		
 		TextureRegion reg=null;
-		reg=regCard;/*
-		Color color = sp.getColor();//get current Color, you can't modify directly
-		float oldAlpha = color.a; //save its alpha
-
-		//From here you can modify alpha however you want
-		float alphaScale = alpha;
-		color.a = oldAlpha*alphaScale; //ex. scale = 0.5 will make alpha halved
-		sp.setColor(color); //set it*/
+		reg=regCard;
 		batch.draw(reg.getTexture(),
 				position.x, position.y,
 				origin.x, origin.y,

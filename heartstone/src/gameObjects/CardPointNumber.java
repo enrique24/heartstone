@@ -4,7 +4,11 @@ import util.Constants;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-
+/**
+ * Represents the hit points of a card
+ * @author Enrique Martín Arenal
+ *
+ */
 public class CardPointNumber extends AbstractGameObject{
 	
 	private TextureRegion regNumber;

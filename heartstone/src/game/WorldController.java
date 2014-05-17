@@ -1,136 +1,211 @@
 package game;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.Socket;
-import java.util.ArrayList;
-
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.alpha;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.fadeOut;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.moveTo;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.parallel;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.scaleTo;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
 import gameObjects.Card;
 import gameObjects.CardPointNumber;
 import gameObjects.Player;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
 import screens.MenuScreen;
 import util.AudioManager;
 import util.CameraHelper;
 import util.Constants;
-import util.Network;
-import util.Network.RegisterName;
-import util.Stats;
 import util.Network.ActionMessage;
+import util.Stats;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Pixmap.Format;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Interpolation;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.utils.Array;
 import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
-import com.me.hs.HStone;
 
-import static com.badlogic.gdx.scenes.scene2d.actions.Actions.*;
-
-import com.badlogic.gdx.math.Interpolation;
-
+/**
+ * Class that handles and processes the input of the GameScreen and updates the game accordingly
+ * to the game logic
+ * @author Enrique Martín Arenal
+ *
+ */
 public class WorldController extends InputAdapter {
-	// TODO controlar que al llegar a 0 la vida no pete al mostrar los numeros
-	// TODO terminar las partidas
-	// The current game
+
+	/**
+	 *  The current game
+	 */
 	public Game game;
-	// The socket used to receive/send data from/to the server
+	/**
+	 *  The socket used to receive/send data from/to the server
+	 */
 	private Client clientSocket;
+	/**
+	 *  Whether the game has or has not begin
+	 */
 	public boolean startGame = false;
-	// Sprites used to render some objects that appear in the game
+	/**
+	 *  Sprites used to render some objects that appear in the game
+	 */
 	public Sprite[] testSprites;
+	/**
+	 * List of cards organized by its position on the screen
+	 */
 	ArrayList<Card> cardsHand = new ArrayList<Card>();
 	ArrayList<Card> cardsTable = new ArrayList<Card>();
 	ArrayList<Card> cardsEnemy = new ArrayList<Card>();
+	
 	public CameraHelper cameraHelper;
-	public ArrayList<Stats> cardStats = new ArrayList<Stats>();
+	
 	public Player player;
-	// A rectangle that represents the table zone of the player
+	/**
+	 *  A rectangle that represents the table zone of the player
+	 */
 	private Rectangle table;
-	// A rectangle that represents the enemy player
+	/**
+	 *  A rectangle that represents the enemy player
+	 */
 	private Rectangle enemyPlayerBounds;
-	// A rectangle that represents the player
+	/**
+	 *  A rectangle that represents the player
+	 */
 	private Rectangle playerBounds;
-	// boolean used to update the animation that brings a card to the table
+	/**
+	 *  boolean used to update the animation that brings a card to the table
+	 */
 	private boolean moveToTable = false;
-	// boolean used to update an attack animation
+	/**
+	 *  boolean used to update an attack animation
+	 */
 	public boolean attackCard = false;
-	// boolean used to perform an attack from an enemy animation
+	/**
+	 *  boolean used to perform an attack from an enemy animation
+	 */
 	public boolean attackCardEnemy = false;
-	// boolean used to control the attack animation
+	/**
+	 *  boolean used to control the attack animation
+	 */
 	private boolean returningCard = false;
-	// boolean used to start the animation of a card who dying
+	/**
+	 *  boolean used to start the animation of a card who dying
+	 */
 	public boolean dyingCard = false;
-	// boolean used to start the animation of cards in the hand reordering
+	/**
+	 *  boolean used to start the animation of cards in the hand reordering
+	 */
 	public boolean reorderHandCards = false;
-	// boolean used to start the animation of cards in the table reordering
+	/**
+	 *  boolean used to start the animation of cards in the table reordering
+	 */
 	public boolean reorderTableCards = false;
-	// boolean used to start the animation of enemy cards reordering
+	/**
+	 *  boolean used to start the animation of enemy cards reordering
+	 */
 	public boolean reorderEnemyCards = false;
-	// boolean used to start the animation of bringing a new card to the game
+	/**
+	 *  boolean used to start the animation of bringing a new card to the game
+	 */
 	public boolean addNewCard = false;
-	// boolean used to start the animation of loosing a card if you have the max
-	// amount of card allowed on hand
+	/**
+	 *  boolean used to start the animation of loosing a card if you have the max
+	 *  amount of card allowed on hand
+	 */
 	public boolean looseCard = false;
-	// booleans used for playing sound purposes
+	/**
+	 *  booleans used for playing sound purposes
+	 */
 	public boolean playMoveCardSound = true;
 	public boolean playDieSound = true;
 	public boolean playAttackSound = false;
 	public boolean playTurnTimeEnding = true;
-	// TODO a lo mejor algun booleano para sonido mas, poner que el sonido y la
-	// musica se actualicen enseguida
 	public boolean disconnect = false;
-	// Card that is going to have an animation
+	/**
+	 *  Card that is going to have an animation
+	 */
 	Card animatedCard;
-	// Card that is going to be attacked
+	/**
+	 *  Card that is going to be attacked
+	 */
 	Card attackedCard, attackingCard;
-	// position on the table of the attacking card
+	/**
+	 *  position on the table of the attacking card
+	 */
 	int attackingCardPosition;
-	// Vector used to translate the cards
+	/**
+	 *  Vector used to translate the cards
+	 */
 	protected Vector2 v2Velocity = new Vector2();
-	// Particles used to create a special effect when a card dies
+	/**
+	 *  Particles used to create a special effect when a card dies
+	 */
 	public ParticleEffect dyingParticles = new ParticleEffect();
+	/**
+	 *  Particles used to create a special effect when a card dies
+	 */
 	public ParticleEffect dyingParticles2 = new ParticleEffect();
-	// Particles used to create a special effect when a card attacks
+	/**
+	 *  Particles used to create a special effect when a card attacks
+	 */
 	public ParticleEffect attackParticles = new ParticleEffect();
+	/**
+	 *  Particles used to create a special effect when a card attacks
+	 */
 	public ParticleEffect attackParticles2 = new ParticleEffect();
-	// Boolean used to render the attack special effect
+	/**
+	 *  Boolean used to render the attack special effect
+	 */
 	public boolean attackSpecialEffect = false;
-	// Sprites used to represent buttons to pass the turn to the other player
+	/**
+	 *  Sprites used to represent buttons to pass the turn to the other player
+	 */
 	Sprite buttonPassTurn;
+	/**
+	 *  Sprites used to represent buttons to pass the turn to the other player
+	 */
 	Sprite buttonEnemyTurn;
-	// Rectangle that represents the button to pass turn
+	/**
+	 *  Rectangle that represents the button to pass turn
+	 */
 	Rectangle buttonTurn;
 	public int maxCrystals = 0;
-	// Message to show to the player at the start
+	/**
+	 *  Message to show to the player when it is necessary.
+	 *  It is initialized to show a message at the start of a game
+	 */
 	public String message = "Buscando enemigos contra los que enfrentarse";
-	// variable used to keep track of time since a player receives his turn
+	/**
+	 *  variable used to keep track of time since a player receives his turn
+	 */
 	public float turnTime;
-	// boolean used to know when a game has reached its end
+	/**
+	 *  boolean used to know when a game has reached its end
+	 */
 	public boolean gameEnded = false;
-	// Object used to represent the end of a game
+	/**
+	 *  Object used to represent the end of a game
+	 */
 	public Image endImage;
+	/**
+	 *  Object used to represent the end of a game
+	 */
 	public Image endBackgroundImage;
 
 	public WorldController(Client socket, Listener listener, Game game) {
 		this.game = game;
 		init();
 		this.clientSocket = socket;
-		new Thread("ww") {
+		//starts a new thread that updates the connection with the server
+		new Thread("connectionupdate") {
 			public void run() {
 				try {
 
@@ -151,6 +226,9 @@ public class WorldController extends InputAdapter {
 
 	}
 
+	/**
+	 * Initializes the required elements to start a game
+	 */
 	private void initGameObjects() {
 		// Create new array for 21 sprites for diverse purposes, background,
 		// glow effect and the user gui
@@ -197,7 +275,7 @@ public class WorldController extends InputAdapter {
 		spr2.setPosition(-9, -6);
 		testSprites[0] = spr2;
 
-		// Gui Sprites
+		// Gui Sprites, indicates the current state of the game to the player
 		spr2 = new Sprite(Assets.instance.carta.getCardRegion("tusalud"));
 		spr2.setSize(Constants.CARD_HIT_NUMBER_WIDTH + 1.4f,
 				Constants.CARD_HIT_NUMBER_HEIGHT + 0.2f);
@@ -284,6 +362,10 @@ public class WorldController extends InputAdapter {
 
 	}
 
+	/**
+	 * Updates the game
+	 * @param deltaTime Elapsed time since the last frame was rendered
+	 */
 	public void update(float deltaTime) {
 		if (startGame) {
 			if (!gameEnded) {
@@ -329,7 +411,9 @@ public class WorldController extends InputAdapter {
 
 	}
 
-	// update all cards bounds to match its current position
+	/**
+	 *  Update all cards bounds to match its current position
+	 */
 	private void updateBounds() {
 		for (Card card : cardsHand) {
 			card.bounds.x = card.position.x;
@@ -345,19 +429,11 @@ public class WorldController extends InputAdapter {
 		}
 	}
 
-	private void updateTestObjects(float deltaTime) {
-		/*
-		 * // Get current rotation from selected sprite float rotation =
-		 * testSprites[selectedSprite].getRotation(); // Rotate sprite by 90
-		 * degrees per second rotation += 90 * deltaTime; // Wrap around at 360
-		 * degrees rotation %= 360; // Set new rotation value to selected sprite
-		 * testSprites[selectedSprite].setRotation(rotation);
-		 */
 
-	}
-
-	// Select the car only if is your turn , the card is touched and the
-	// card has not been used during the current turn
+	/**
+	 *  Select the card only if is your turn , the card is touched and the
+	 *   card has not been used during the current turn
+	 */
 	private void selectCard() {
 		if (player.isYourTurn()) {
 			if (Gdx.input.justTouched()) {
@@ -385,7 +461,7 @@ public class WorldController extends InputAdapter {
 										carta.position.y);
 								AudioManager.instance
 										.play(Assets.instance.sounds.selectCard);
-								// Set as selected the card that has been
+								// Set as selected the card the one that has been
 								// touched
 								for (int i = 0; i < cardsHand.size(); i++) {
 									if (cardsHand.get(i) == carta) {
@@ -407,7 +483,7 @@ public class WorldController extends InputAdapter {
 						}
 
 					}
-					// Check if a cards in the table is touched an then select
+					// Check if a card in the table is touched an then select
 					// it
 					for (Card carta : cardsTable) {
 						if (!carta.isUsed()) {
@@ -453,9 +529,13 @@ public class WorldController extends InputAdapter {
 		}
 	}
 
-	// Drag a selected card on the hand to the table
+	/**
+	 *  Drag a selected card on the hand to the table
+	 * @param deltaTime Elapsed time since the last frame was rendered
+	 */
 	private void moveCardToTable(float deltaTime) {
 		if (player.isYourTurn()) {
+			//There is a max of 5 cards in the table
 			if (Gdx.input.justTouched() && cardsTable.size() < 5) {
 				for (int i = 0; i < cardsHand.size(); i++) {
 					if (cardsTable.size() > 0) {
@@ -473,7 +553,7 @@ public class WorldController extends InputAdapter {
 					if (cardsHand.get(i).isSelected()
 							&& (cardsHand.get(i).getCrystalCost() <= player
 									.getCrystalsLeft())) {
-
+						//Check if the user has touched in a free space of the table
 						if (table.contains(
 								(float) (Gdx.input.getX() - (Gdx.graphics
 										.getWidth() / 2))
@@ -496,11 +576,16 @@ public class WorldController extends InputAdapter {
 									testSprites[Constants.GUI_POSITION_CRISTALES_TENS],
 									testSprites[Constants.GUI_POSITION_CRISTALES_UNITS],
 									player.getCrystalsLeft());
+							//The glow effect
 							testSprites[1].setPosition(11, 11);
+							//Move the card from one list to another
 							cardsTable.add(cardsHand.get(i));
 							cardsHand.remove(i);
+							//start the animation to move the card to the table
 							moveToTable = true;
+							//reorder the cards in the hand if necessary
 							reorderHandCards = true;
+							//Play the sound of a card moving
 							AudioManager.instance
 									.play(Assets.instance.sounds.new_card);
 							// send data to server
@@ -511,30 +596,16 @@ public class WorldController extends InputAdapter {
 
 						}
 					}
-					// checks if the player has tried to move a card without
-					// enough crystals to do it
-					if (cardsHand.get(i).isSelected()
-							&& cardsHand.get(i).getCrystalCost() > player
-									.getCrystalsLeft()) {
-						if (table.contains(
-								(float) (Gdx.input.getX() - (Gdx.graphics
-										.getWidth() / 2))
-										/ (Gdx.graphics.getWidth() / 2) * (9),
-								(float) (Gdx.input.getY() - (Gdx.graphics
-										.getHeight() / 2))
-										/ (Gdx.graphics.getHeight() / 2)
-										* (6)
-										* -1)) {
-
-						}
-
-					}
+					
 				}
 			}
 		}
 	}
 
-	// Animation to move a card to the table
+	/**
+	 *  Animation to move a card to the table
+	 * @param deltaTime Elapsed time since the last frame was rendered
+	 */
 	private void moveCardToTableAnimation(float deltaTime) {
 		if (moveToTable) {
 
@@ -558,7 +629,9 @@ public class WorldController extends InputAdapter {
 		}
 	}
 
-	// Card performing an attack
+	/**
+	 * Checks if the player has tried to attack the enemy or an enemy card
+	 */
 	private void attackCardCommand() {
 		if (player.isYourTurn() && cardsTable.size() > 0) {
 			// checks which card in the table is selected , return if no card is
@@ -573,6 +646,7 @@ public class WorldController extends InputAdapter {
 				if (i == cardsTable.size() - 1)
 					return;
 			}
+			//Can´t attack if another card is already attacking
 			if (Gdx.input.justTouched() && !attackCard) {
 				// Check if an enemy card is touched while a card in the hand is
 				// selected
@@ -590,6 +664,7 @@ public class WorldController extends InputAdapter {
 						playAttackSound = true;
 						attackCard = true;
 						attackedCard = carta;
+						//Collecting and sending data to server
 						Stats animatedStats = getStatsFromCard(attackingCard);
 						Stats attackedStats = getStatsFromCard(attackedCard);
 						animatedStats
@@ -601,6 +676,7 @@ public class WorldController extends InputAdapter {
 						return;
 					}
 				}
+				//checks if the player tries to attack the enemy
 				if (enemyPlayerBounds
 						.contains(
 								(float) (Gdx.input.getX() - (Gdx.graphics
@@ -613,10 +689,12 @@ public class WorldController extends InputAdapter {
 										* -1)) {
 					attackCard = true;
 					playAttackSound = true;
+					//Card representing the enemy
 					attackedCard = new Card(null, enemyPlayerBounds.x,
 							enemyPlayerBounds.y, 0, 100, 0, null);
 					player.setEnemyHitPoints(player.getEnemyHitPoints()
 							- attackingCard.getAttackPoints());
+					//Don't have assets that represent numbers below 0
 					if (player.getEnemyHitPoints() < 0) {
 						player.setEnemyHitPoints(0);
 					}
@@ -624,6 +702,7 @@ public class WorldController extends InputAdapter {
 							testSprites[Constants.GUI_POSITION_SU_SALUD_TENS],
 							testSprites[Constants.GUI_POSITION_SU_SALUD_UNITS],
 							player.getEnemyHitPoints());
+					//Collecting and sending data to server
 					Stats animatedStats = getStatsFromCard(attackingCard);
 					animatedStats
 							.setCardAction(Stats.CARD_ACTION_ATTACK_PLAYER);
@@ -635,7 +714,10 @@ public class WorldController extends InputAdapter {
 
 	}
 
-	// Method invoked to start an animation which shows an enemy attacking you
+	/**
+	 *  Method invoked to start an animation which shows an enemy attacking you
+	 * @param playerAttacked true if the attack is performed to the player, false if its to a card
+	 */
 	public void attackFromEnemy(boolean playerAttacked) {
 		if (playerAttacked) {
 			this.attackedCard = new Card(null, playerBounds.x, playerBounds.y,
@@ -657,11 +739,14 @@ public class WorldController extends InputAdapter {
 				break;
 			}
 		}
+		//Starts the animation and the sound
 		attackCardEnemy = true;
 		playAttackSound = true;
 	}
 
-	// The animation of an enemy card attacking
+	/**
+	 *  The animation of an enemy card attacking
+	 */
 	public void attackFromEnemyAnimation() {
 		if (attackCardEnemy) {
 			// The card moves to the other card position and performs an attack.
@@ -691,6 +776,7 @@ public class WorldController extends InputAdapter {
 					if (playAttackSound) {
 						AudioManager.instance
 								.play(Assets.instance.sounds.attack);
+						//Play the sound just once
 						playAttackSound = false;
 					}
 
@@ -698,7 +784,7 @@ public class WorldController extends InputAdapter {
 
 				if (attackingCard.position.y < attackedCard.position.y + 0.1)
 					returningCard = true;
-			} else {
+			} else { //the card returns to its previous position
 				v2Velocity.set(attackingCard.position.x
 						- attackedCard.position.x, attackingCard.position.y
 						- attackedCard.position.y);
@@ -722,9 +808,12 @@ public class WorldController extends InputAdapter {
 		}
 	}
 
-	// The animation of a card attacking
+	/**
+	 *  The animation of a card attacking to the enemy
+	 */
 	private void attackCardAnimation() {
 		if (attackCard) {
+			//the glow effect
 			testSprites[1].setPosition(15, 15);
 			// The card moves to the other card position and performs an attack.
 			// then goes back to its previous position
@@ -753,12 +842,13 @@ public class WorldController extends InputAdapter {
 					if (playAttackSound) {
 						AudioManager.instance
 								.play(Assets.instance.sounds.attack);
+						//Play the sound just once
 						playAttackSound = false;
 					}
 				}
 				if (attackingCard.position.y > attackedCard.position.y - 0.1)
 					returningCard = true;
-			} else {
+			} else { //the card returns to its previous position
 				v2Velocity.set(attackingCard.position.x
 						- attackedCard.position.x, attackingCard.position.y
 						- attackedCard.position.y);
@@ -777,7 +867,7 @@ public class WorldController extends InputAdapter {
 					attackParticles.allowCompletion();
 					attackParticles2.allowCompletion();
 					attacksLogic(attackingCard, attackedCard);
-					// TODO: enviar datos al server
+				
 				}
 
 			}
@@ -785,7 +875,12 @@ public class WorldController extends InputAdapter {
 		}
 	}
 
-	// The logic behind an attack
+	/**
+	 *  The logic behind an attack that involves two cards, updates the hit points remaining
+	 *  of the both card and checks if they are still alive after the attack 
+	 * @param yourCard the card that performs the attack
+	 * @param enemyCard the other card
+	 */
 	private void attacksLogic(Card yourCard, Card enemyCard) {
 		// your card new stats
 		TextureRegion regNumber;
@@ -816,7 +911,9 @@ public class WorldController extends InputAdapter {
 		enemyCard.setHitPoint(new CardPointNumber(regNumber));
 	}
 
-	// Animation for a card that is going to die
+	/**
+	 *  Performs an animation for a card that is going to die
+	 */
 	private void cardDiesAnimation() {
 		if (dyingCard) {
 
@@ -826,6 +923,7 @@ public class WorldController extends InputAdapter {
 				dyingParticles.setPosition(attackingCard.position.x + 1.3f,
 						attackingCard.position.y + 2.1f);
 				dyingParticles.start();
+				//Used to know when to stop the animation
 				attackingCard.setAlpha(attackingCard.getAlpha() - 0.01f);
 				if (playDieSound)
 					AudioManager.instance.play(Assets.instance.sounds.dead_guy);
@@ -840,7 +938,7 @@ public class WorldController extends InputAdapter {
 				} else {
 					player.setEnemyCardsOnTable(player.getEnemyCardsOnTable() - 1);
 				}
-				// TODO: mandar datos al server
+				
 				// start reordering cards after the card "disappears"
 				reorderTableCards = true;
 				reorderEnemyCards = true;
@@ -863,7 +961,7 @@ public class WorldController extends InputAdapter {
 				} else {
 					player.setEnemyCardsOnTable(player.getEnemyCardsOnTable() - 1);
 				}
-				// TODO: mandar datos al server
+			
 				// start reordering cards after the card "disappears"
 				reorderTableCards = true;
 				reorderEnemyCards = true;
@@ -876,8 +974,11 @@ public class WorldController extends InputAdapter {
 		}
 	}
 
-	// animation for reordering cards in the hand , this is done to have an
-	// easier time dealing with cards positions
+	/**
+	 *  Animation for reordering cards in the hand , this is done to have an
+	 *  easier time dealing with cards positions
+	 */
+	
 	private void reorderHandCardAnimation() {
 		if (reorderHandCards) {
 			// if there is no cards there is no need to reorder them
@@ -919,8 +1020,10 @@ public class WorldController extends InputAdapter {
 		}
 	}
 
-	// animation for reordering cards in the table , this is done to have an
-	// easier time dealing with cards positions
+	/**
+	 *  animation for reordering cards in the table , this is done to have an
+	 *  easier time dealing with cards positions
+	 */
 	private void reorderTableCardAnimation() {
 		if (reorderTableCards) {
 			// if there is no cards there is no need to reorder them
@@ -948,8 +1051,10 @@ public class WorldController extends InputAdapter {
 		}
 	}
 
-	// animation for reordering enemy cards , this is done to have an
-	// easier time dealing with cards positions
+	/**
+	 *  animation for reordering enemy cards , this is done to have an
+	 *  easier time dealing with cards positions
+	 */
 	private void reorderEnemyCardAnimation() {
 		if (reorderEnemyCards) {
 			// if there is no cards there is no need to reorder them
@@ -982,8 +1087,11 @@ public class WorldController extends InputAdapter {
 		}
 	}
 
-	// Creates a new card with his statistics given an places it in the correct
-	// array
+	/**
+	 * Creates a new card with his statistics given an places it in the cards hand
+	 * @param stats The stats of the new card
+	 */
+	
 	public void addCardToGame(Stats stats) {
 		// creates the card out of sight
 		Vector2 position = new Vector2(15, 0);
@@ -994,9 +1102,12 @@ public class WorldController extends InputAdapter {
 		animatedCard = card;
 
 		cardsHand.add(card);
+		//The player can only have up to 5 cards in the hand
+		// If he already have the max then he looses the new card
 		if (cardsHand.size() < 6) {
 			player.setCardsLeft(player.getCardsLeft() - 1);
 			player.setCardsOnHand(player.getCardsOnHand() + 1);
+			//moves the card from the outside to its correspondent position
 			reorderHandCards = true;
 		} else {
 			animatedCard = card;
@@ -1005,31 +1116,10 @@ public class WorldController extends InputAdapter {
 
 	}
 
-	public ArrayList<Card> getCardsHand() {
-		return cardsHand;
-	}
-
-	public void setCardsHand(ArrayList<Card> cardsHand) {
-		this.cardsHand = cardsHand;
-	}
-
-	public ArrayList<Card> getCardsTable() {
-		return cardsTable;
-	}
-
-	public void setCardsTable(ArrayList<Card> cardsTable) {
-		this.cardsTable = cardsTable;
-	}
-
-	public ArrayList<Card> getCardsEnemy() {
-		return cardsEnemy;
-	}
-
-	public void setCardsEnemy(ArrayList<Card> cardsEnemy) {
-		this.cardsEnemy = cardsEnemy;
-	}
-
-	// add an enemy card to the game card
+	/**
+	 * Add an enemy card to the game
+	 * @param stats The stats of the enemy card
+	 */
 	public void addEnemyCardToGame(Stats stats) {
 		// creates the card out of sight
 		Vector2 position = new Vector2(15, 0);
@@ -1055,7 +1145,11 @@ public class WorldController extends InputAdapter {
 
 	}
 
-	// get the Stats from a card
+	/**
+	 * Extract the Stats from a card
+	 * @param card 
+	 * @return the stats of the given card
+	 */
 	public Stats getStatsFromCard(Card card) {
 		Stats cardStats = new Stats();
 		cardStats.setAttackPower(card.getAttackPoints());
@@ -1066,7 +1160,9 @@ public class WorldController extends InputAdapter {
 		return cardStats;
 	}
 
-	// Pass turn
+	/**
+	 * Checks if the player had touched the pass turn button
+	 */
 	public void passTurn() {
 		if (player.isYourTurn()) {
 			// do not pass turns while animations are happening
@@ -1088,6 +1184,7 @@ public class WorldController extends InputAdapter {
 						player.setYourTurn(false);
 						AudioManager.instance
 								.play(Assets.instance.sounds.pass_turn);
+						//send data to server
 						ActionMessage msg = new ActionMessage();
 						msg.action = ActionMessage.PASS_TURN;
 						clientSocket.sendTCP(msg);
@@ -1096,6 +1193,7 @@ public class WorldController extends InputAdapter {
 									.getEnemycardsOnHand() + 1);
 
 						}
+						// resets the cards used state to false
 						resetUsed();
 						testSprites[Constants.GUI_POSITION_MANO_UNITS]
 								.setRegion(Assets.instance.hitPoint
@@ -1111,7 +1209,9 @@ public class WorldController extends InputAdapter {
 		}
 	}
 
-	// animation for a loosed card
+	/**
+	 *  Performs an animation for a loosed card
+	 */
 	private void looseCardAnimation() {
 		if (looseCard) {
 			// The .set() is setting the distance from the starting position to
@@ -1129,15 +1229,20 @@ public class WorldController extends InputAdapter {
 		}
 	}
 
-	// sets the used state of all the cards in the table to false
+	/**
+	 *  sets the used state of all the cards in the table to false
+	 */
 	public void resetUsed() {
 		for (Card card : cardsTable) {
 			card.setUsed(false);
 		}
 	}
 
-	// sets the animatedCard given the stats from the enemy card that is going
-	// to perform an attack
+	/**
+	 * Set which card is going to attack knowing the card stats
+	 * @param stat the stats of the enemy card that is going to attack
+	 * @param attackEnemyPlayer true=attack the enemy, false= attack a card
+	 */
 	public void setAnimatedCardForEnemyAttack(Stats stat,
 			boolean attackEnemyPlayer) {
 		for (Card card : cardsEnemy) {
@@ -1148,8 +1253,11 @@ public class WorldController extends InputAdapter {
 		}
 	}
 
-	// sets the attackedCard given the stats from the server if the card that is
-	// going to receive an attack
+	/**
+	 * Sets the attackedCard given the stats from the server of the card that is
+	 * going to receive an attack
+	 * @param stat stats to identify the card that is going to be attacked
+	 */
 	public void setAttackedCardForEnemyAttack(Stats stat) {
 		for (Card card : cardsTable) {
 			if (card.getCardName().equals(stat.getCardName())) {
@@ -1158,17 +1266,22 @@ public class WorldController extends InputAdapter {
 		}
 	}
 
+	/**
+	 * Go to the MenuScreen if the player touch the back key or cannot connect to server
+	 */
 	private void backToMenu() {
 		// disconnects from server and goes back to the menu screen
 		if (Gdx.input.isKeyPressed(Input.Keys.BACK) || disconnect) {
 			clientSocket.stop();
-			// game.setScreen(new MenuScreen(game));
 		}
 
 	}
 
-	// Method used to pass the turn to the enemy in case that this player takes
-	// too much time using his turn
+	/**
+	 * Method used to pass the turn to the enemy in case that this player takes
+	 * too much time using his turn
+	 * @param deltaTime Elapsed time since las frame was rendered
+	 */
 	private void autoPassTurn(float deltaTime) {
 		if (player.isYourTurn()) {
 			turnTime += deltaTime;
@@ -1176,7 +1289,7 @@ public class WorldController extends InputAdapter {
 				AudioManager.instance.play(Assets.instance.sounds.time_ending);
 				playTurnTimeEnding = false;
 			}
-			if (turnTime > 120 && !attackCard) {
+			if (turnTime > 120 && !attackCard && !moveToTable) {
 				player.setYourTurn(false);
 				AudioManager.instance.play(Assets.instance.sounds.pass_turn);
 				ActionMessage msg = new ActionMessage();
@@ -1196,7 +1309,9 @@ public class WorldController extends InputAdapter {
 		}
 	}
 
-	// Method used to know when the game has ended
+	/**
+	 *  Method used to know when the game has ended
+	 */
 	private void isGameEnded() {
 		if (player.getHitPoints() < 1
 				&& (!moveToTable && !attackCard && !dyingCard
@@ -1210,13 +1325,17 @@ public class WorldController extends InputAdapter {
 				&& (!moveToTable && !attackCard && !dyingCard
 						&& !attackCardEnemy && !reorderEnemyCards
 						&& !reorderHandCards && !reorderTableCards)) {
-			// TODO: cambiar por la imagen de victoria
+	
 			setEndingImage("victoria");
 			AudioManager.instance.play(Assets.instance.sounds.win);
 			gameEnded = true;
 		}
 	}
 
+	/**
+	 * Shows the ending image win or defeat
+	 * @param imageName The name of the image 
+	 */
 	private void setEndingImage(String imageName) {
 		// Alpha=0.6 black background
 		endBackgroundImage = new Image(
@@ -1241,7 +1360,12 @@ public class WorldController extends InputAdapter {
 
 	}
 
-	// Sets the correct number to display in the chosen part of the gui
+	/**
+	 *  Sets the correct number to display in the chosen part of the gui
+	 * @param tens the sprite that represents the tens
+	 * @param units the sprite that represents the units
+	 * @param stat the stat that is going to be updated
+	 */
 	public void setGuiNumbers(Sprite tens, Sprite units, int stat) {
 		if (stat < 10) {
 			tens.setRegion(Assets.instance.hitPoint.getNumberRegion(0));
@@ -1253,7 +1377,9 @@ public class WorldController extends InputAdapter {
 		}
 	}
 
-	// initializes the gui numbers
+	/**
+	 *  initializes the gui numbers
+	 */
 	public void initGuiNumbers() {
 		// Tu salud
 		Sprite spr2 = new Sprite(Assets.instance.hitPoint.getNumberRegion(3));

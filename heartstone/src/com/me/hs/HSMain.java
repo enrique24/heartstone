@@ -1,9 +1,9 @@
 package com.me.hs;
 
+import game.Assets;
 import screens.MenuScreen;
 import util.AudioManager;
 import util.GamePreferences;
-import game.Assets;
 
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
@@ -11,7 +11,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 
 
-
+/**
+ * Launch this game
+ * @author Enrique Martín Arenal
+ *
+ */
 public class HSMain extends Game {
 
 	@Override

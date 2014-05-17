@@ -3,7 +3,11 @@ package gameObjects;
 
 import util.Constants;
 
-//Represents the actual state of a game
+/**
+ * Represents the actual state of a game
+ * @author Enrique Martín Arenal
+ *
+ */
 public class Player{
 
 	private int hitPoints;

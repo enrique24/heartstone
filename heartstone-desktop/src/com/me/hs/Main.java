@@ -7,15 +7,13 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 import com.badlogic.gdx.tools.texturepacker.TexturePacker.Settings;
-import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Listener;
+
 
 public class Main {
 
 	private static boolean rebuildAtlas = false;
 	private static boolean drawDebugOutline = false;
-	static Client client;
-	static Listener listener = null;
+
 
 	public static void main(String[] args) throws IOException {
 
@@ -35,7 +33,7 @@ public class Main {
 		cfg.useGL20 = false;
 		cfg.width = 640;
 		cfg.height = 400;
-		client = new Client();
+
 
 		// new LwjglApplication(new HStone(client,listener), cfg);
 		new LwjglApplication(new HSMain(), cfg);

@@ -4,7 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.math.MathUtils;
 
-
+/**
+ * Abstracts the process of loading and saving all the game settings
+ * @author Enrique Martín Arenal
+ *
+ */
 public class GamePreferences {
 
 	public static final String TAG = GamePreferences.class.getName();
@@ -15,14 +19,13 @@ public class GamePreferences {
 	public boolean music;
 	public float volSound;
 	public float volMusic;
-	public int charSkin;
 	public boolean showFpsCounter;
-	public boolean useMonochromeShader;
-
 	private Preferences prefs;
 
-	// singleton: prevent instantiation from other classes
-	private GamePreferences() {
+	/**
+	 *  singleton: prevent instantiation from other classes
+	 */
+	private GamePreferences() { 
 		prefs = Gdx.app.getPreferences(Constants.PREFERENCES);
 	}
 
@@ -33,9 +36,7 @@ public class GamePreferences {
 				.clamp(prefs.getFloat("volSound", 0.5f), 0.0f, 1.0f);
 		volMusic = MathUtils
 				.clamp(prefs.getFloat("volMusic", 0.5f), 0.0f, 1.0f);
-		charSkin = MathUtils.clamp(prefs.getInteger("charSkin", 0), 0, 2);
 		showFpsCounter = prefs.getBoolean("showFpsCounter", false);
-		useMonochromeShader = prefs.getBoolean("useMonochromeShader", false);
 	}
 
 	public void save() {
@@ -43,9 +44,7 @@ public class GamePreferences {
 		prefs.putBoolean("music", music);
 		prefs.putFloat("volSound", volSound);
 		prefs.putFloat("volMusic", volMusic);
-		prefs.putInteger("charSkin", charSkin);
 		prefs.putBoolean("showFpsCounter", showFpsCounter);
-		prefs.putBoolean("useMonochromeShader", useMonochromeShader);
 		prefs.flush();
 	}
 
