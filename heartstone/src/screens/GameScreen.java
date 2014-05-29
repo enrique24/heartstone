@@ -201,8 +201,8 @@ public class GameScreen extends AbstractGameScreen {
 						worldController.maxCrystals = worldController.player
 								.getCrystalsLeft();
 						firstTurn = false;
-						worldController.startGame = true;
 						worldController.initGuiNumbers();
+						worldController.startGame = true;					
 						worldController.player.setCardsLeft(22);
 
 					} else {
