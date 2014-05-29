@@ -188,7 +188,7 @@ public class MenuScreen extends AbstractGameScreen {
 		// + Checkbox, "Music" label, music volume slider
 		chkMusic = new CheckBox("", skinLibgdx);
 		tbl.add(chkMusic);
-		tbl.add(new Label("Música", skinLibgdx));
+		tbl.add(new Label("Musica", skinLibgdx));
 		sldMusic = new Slider(0.0f, 1.0f, 0.1f, false, skinLibgdx);
 		tbl.add(sldMusic);
 		tbl.row();

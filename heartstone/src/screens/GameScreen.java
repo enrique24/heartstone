@@ -21,10 +21,12 @@ import com.badlogic.gdx.graphics.GL10;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+
 /**
- * Starts the game 
+ * Starts the game
+ * 
  * @author Enrique Martín Arenal
- *
+ * 
  */
 public class GameScreen extends AbstractGameScreen {
 
@@ -43,7 +45,7 @@ public class GameScreen extends AbstractGameScreen {
 		super(game);
 		this.clientSocket = client;
 		this.listener = listen;
-		//It can be changed to LOG_DEBUG if needed
+		// It can be changed to LOG_DEBUG if needed
 		Gdx.app.setLogLevel(Application.LOG_NONE);
 		// Load assets
 		Assets.instance.init(new AssetManager());
@@ -55,7 +57,6 @@ public class GameScreen extends AbstractGameScreen {
 
 	}
 
-	
 	@Override
 	public void render(float deltaTime) {
 		// Do not update game world when paused.
@@ -79,7 +80,6 @@ public class GameScreen extends AbstractGameScreen {
 
 	}
 
-	
 	@Override
 	public void show() {
 		util.GamePreferences.instance.load();
@@ -98,7 +98,7 @@ public class GameScreen extends AbstractGameScreen {
 				clientSocket.sendTCP(registerName);
 			}
 
-			//received object from the server
+			// received object from the server
 			public void received(Connection connection, Object object) {
 				if (object instanceof Stats) {
 					Stats card = (Stats) object;
@@ -122,16 +122,35 @@ public class GameScreen extends AbstractGameScreen {
 						worldController.setAttackedCardForEnemyAttack(card);
 					} else if (card.getCardAction().equals(
 							Stats.CARD_ACTION_ATTACKING_CARD)) {
-						worldController.setAnimatedCardForEnemyAttack(card,
-								false);
+					/*	while (worldController.dyingCard
+								|| worldController.attackCardEnemy
+								|| worldController.reorderHandCards) {
+							if (!worldController.dyingCard
+									&& !worldController.attackCardEnemy
+									&& !worldController.reorderHandCards) {
+								worldController.setAnimatedCardForEnemyAttack(
+										card, false);
+							}
+
+						}*/
+						
+						 worldController.setAnimatedCardForEnemyAttack(card,
+						 false);
+						 
 					} else if (card.getCardAction().equals(
 							Stats.CARD_ACTION_ATTACK_PLAYER)) {
 						worldController.setAnimatedCardForEnemyAttack(card,
 								true);
 					} else if (card.getCardAction().equals(Stats.NO_MORE_CARDS)) {
+
 						worldController.player
 								.setHitPoints(worldController.player
 										.getHitPoints() - 1);
+						worldController.player
+								.setEnemyHitPoints(worldController.player
+										.getEnemyHitPoints() - 1);
+						worldController.updateBothPlayerHitPoints=true;
+
 					}
 
 					return;
@@ -141,7 +160,7 @@ public class GameScreen extends AbstractGameScreen {
 					ActionMessage receivedAction = (ActionMessage) object;
 					if (receivedAction.action.equals(ActionMessage.START)) {
 						clientSocket.sendTCP(receivedAction);
-						worldController.message="";
+						worldController.message = "";
 						return;
 					} else if (receivedAction.action
 							.equals(ActionMessage.PASS_TURN)) {
@@ -169,9 +188,9 @@ public class GameScreen extends AbstractGameScreen {
 												.getCrystalsLeft());
 
 					} else if (receivedAction.action
-							.equals(ActionMessage.DISCONNECT)) {			
+							.equals(ActionMessage.DISCONNECT)) {
 						worldController.player.setEnemyHitPoints(0);
-						worldController.message="Tu enemigo se ha desconectado";
+						worldController.message = "Tu enemigo se ha desconectado";
 					}
 					return;
 				}
@@ -196,11 +215,17 @@ public class GameScreen extends AbstractGameScreen {
 				}
 			}
 
-			//Event when disconnect from server
+			// Event when disconnect from server
 			public void disconnected(Connection connection) {
-				//Go back to the menu screen
-				game.setScreen(new MenuScreen(game));		
-				
+				// Go back to the menu screen
+				// game.setScreen(new MenuScreen(game));
+				Gdx.app.postRunnable(new Runnable() {
+					public void run() {
+						game.setScreen(new MenuScreen(game));
+					}
+
+				});
+
 			}
 		};
 		clientSocket.addListener(listener);
@@ -208,9 +233,10 @@ public class GameScreen extends AbstractGameScreen {
 			public void run() {
 				try {
 					// clientSocket.connect(10000, "81.172.115.2",
-					 //Network.port);
-				//	clientSocket.connect(10000, "192.168.1.12", Network.port);
-					clientSocket.connect(10000, "85.54.171.49", Network.port);
+					// Network.port);
+					// clientSocket.connect(10000, "192.168.1.12",
+					// Network.port);
+					clientSocket.connect(10000, "85.54.170.223", Network.port);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 					worldController.message = "No se ha podido conectar con el servidor";
@@ -219,6 +245,7 @@ public class GameScreen extends AbstractGameScreen {
 		}.start();
 		Gdx.input.setCatchBackKey(true);
 		clientSocket.setKeepAliveTCP(8000);
+
 	}
 
 	@Override
@@ -232,6 +259,7 @@ public class GameScreen extends AbstractGameScreen {
 	@Override
 	public void pause() {
 		paused = true;
+		clientSocket.stop();
 
 	}
 
@@ -250,7 +278,8 @@ public class GameScreen extends AbstractGameScreen {
 	}
 
 	/**
-	 *  Method used to exchange the data of one player to another
+	 * Method used to exchange the data of one player to another
+	 * 
 	 * @param dataReceived
 	 * @param player
 	 */
