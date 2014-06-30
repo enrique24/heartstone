@@ -60,11 +60,11 @@ public class GameScreen extends AbstractGameScreen {
 	@Override
 	public void render(float deltaTime) {
 		// Do not update game world when paused.
-		if (!paused) {
+		//if (!paused) {
 			// Update game world by the time that has passed
 			// since last rendered frame.
 			worldController.update(Gdx.graphics.getDeltaTime());
-		}
+		//}
 		// Sets the clear screen color to: Black
 		Gdx.gl.glClearColor(0, 0, 0, 0xff / 255.0f);
 		// Clears the screen
@@ -232,11 +232,8 @@ public class GameScreen extends AbstractGameScreen {
 		new Thread("Connect") {
 			public void run() {
 				try {
-					// clientSocket.connect(10000, "81.172.115.2",
-					// Network.port);
-					// clientSocket.connect(10000, "192.168.1.12",
-					// Network.port);
-					clientSocket.connect(10000, "85.54.170.223", Network.port);
+				
+					clientSocket.connect(10000, Constants.SERVER_IP, Network.port);
 				} catch (IOException ex) {
 					ex.printStackTrace();
 					worldController.message = "No se ha podido conectar con el servidor";
@@ -259,7 +256,7 @@ public class GameScreen extends AbstractGameScreen {
 	@Override
 	public void pause() {
 		paused = true;
-		clientSocket.stop();
+		//clientSocket.stop();
 
 	}
 

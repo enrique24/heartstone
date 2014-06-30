@@ -14,6 +14,7 @@ public class Constants {
 	/**
 	 *  Visible game world is 12 meters tall
 	 */
+	public static final String SERVER_IP="85.54.169.25";
 	public static final float VIEWPORT_HEIGHT = 12.0f;
 	/**
 	 *  GUI Width
